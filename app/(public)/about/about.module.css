@@ -1,0 +1,291 @@
+.pageHero {
+  position: relative;
+  padding: 160px 0 80px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.pageHeroBg {
+  position: absolute;
+  inset: 0;
+}
+
+.pageHeroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(9,9,15,0.8) 0%, rgba(9,9,15,0.7) 50%, rgba(9,9,15,1) 100%);
+}
+
+.pageHeroContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.pageTitle {
+  font-family: var(--font-display);
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-weight: 900;
+  color: var(--white);
+  text-shadow: 0 4px 30px rgba(0,0,0,0.8);
+  line-height: 1;
+}
+
+.pageSubtitle {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--crimson);
+}
+
+/* Story */
+.storySection {
+  padding: var(--section-pad) 0;
+  background: var(--bg-base);
+}
+
+.storyGrid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 80px;
+  align-items: center;
+}
+
+.storyText {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.storyTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1.2;
+}
+
+.storyTitle span {
+  color: var(--crimson);
+}
+
+.storyContent {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.storyContent p {
+  color: var(--white-dim);
+  font-size: 0.95rem;
+  line-height: 1.8;
+}
+
+.storyVisual {
+  position: relative;
+  display: flex;
+  justify-content: center;
+}
+
+.storyImgWrapper {
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 2px solid rgba(178, 34, 52, 0.3);
+  box-shadow: 0 0 60px rgba(178, 34, 52, 0.2);
+}
+
+.storyBadge {
+  position: absolute;
+  bottom: -20px;
+  right: -20px;
+  background: var(--crimson);
+  border-radius: var(--radius-md);
+  padding: 20px 24px;
+  text-align: center;
+  box-shadow: 0 8px 30px rgba(178, 34, 52, 0.4);
+}
+
+.badgeYear {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--white);
+  line-height: 1;
+}
+
+.badgeLabel {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 0.6rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: rgba(245,245,245,0.8);
+  margin-top: 4px;
+}
+
+/* Values */
+.valuesSection {
+  padding: var(--section-pad) 0;
+  background: #0a0a12;
+  position: relative;
+}
+
+.valuesBg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 50%, rgba(178, 34, 52, 0.04) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.valueCard {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 28px;
+  transition: all var(--transition);
+}
+
+.valueCard:hover {
+  border-color: var(--border-accent);
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-crimson);
+}
+
+.valueIcon {
+  font-size: 1.8rem;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.valueTitle {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--crimson);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.valueDesc {
+  color: var(--white-dim);
+  font-size: 0.875rem;
+  line-height: 1.7;
+}
+
+/* Hierarchy */
+.hierarchySection {
+  padding: var(--section-pad) 0;
+  background: var(--bg-base);
+}
+
+.hierarchyList {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rankCard {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 24px 28px;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  overflow: hidden;
+  transition: all var(--transition);
+}
+
+.rankCard:hover {
+  border-color: var(--border-accent);
+  transform: translateX(6px);
+}
+
+.rankNumber {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  font-weight: 900;
+  opacity: 0.4;
+  flex-shrink: 0;
+  min-width: 36px;
+}
+
+.rankIcon {
+  font-size: 1.5rem;
+  flex-shrink: 0;
+}
+
+.rankInfo {
+  flex: 1;
+}
+
+.rankName {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 4px;
+}
+
+.rankDesc {
+  color: var(--white-dim);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.rankBar {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  height: 2px;
+  opacity: 0.3;
+  transition: opacity var(--transition);
+}
+
+.rankCard:hover .rankBar {
+  opacity: 0.6;
+}
+
+/* CTA */
+.aboutCta {
+  padding: 80px 0;
+  background: #0a0a12;
+  text-align: center;
+}
+
+.ctaTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.5rem);
+  font-weight: 800;
+  color: var(--white);
+  margin-bottom: 12px;
+}
+
+.ctaDesc {
+  color: var(--white-dim);
+  margin-bottom: 32px;
+  font-size: 1rem;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .storyGrid { gap: 48px; }
+}
+
+@media (max-width: 768px) {
+  .storyGrid { grid-template-columns: 1fr; gap: 40px; }
+  .storyVisual { display: none; }
+  .rankCard { flex-wrap: wrap; }
+  .rankNumber { min-width: auto; }
+}

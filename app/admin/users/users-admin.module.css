@@ -1,0 +1,272 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.errorAlert {
+  background: rgba(178, 34, 52, 0.15);
+  border: 1px solid var(--crimson-dark);
+  color: #ff8890;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+}
+
+.successAlert {
+  background: rgba(134, 239, 172, 0.15);
+  border: 1px solid #28a745;
+  color: #86efac;
+  padding: 12px 16px;
+  border-radius: var(--radius);
+  font-size: 0.85rem;
+}
+
+.controlBar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+.filters {
+  display: flex;
+  gap: 12px;
+  flex: 1;
+  max-width: 400px;
+}
+
+.searchInput {
+  flex: 1;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  color: var(--white);
+  padding: 10px 16px;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  transition: all var(--transition);
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--crimson);
+}
+
+.tableWrapper {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  overflow-x: auto;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  text-align: left;
+}
+
+.table th,
+.table td {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.85rem;
+}
+
+.table th {
+  font-family: var(--font-display);
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--crimson);
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.adminEmail {
+  font-weight: 600;
+  color: var(--white);
+}
+
+.badge {
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  padding: 4px 10px;
+  border-radius: 4px;
+  white-space: nowrap;
+  display: inline-block;
+  text-transform: uppercase;
+}
+
+.badgeUtama {
+  background: rgba(178, 34, 52, 0.15);
+  color: #ff4d6d;
+  border: 1px solid currentColor;
+}
+
+.badgeSekunder {
+  background: rgba(123, 167, 247, 0.15);
+  color: #7ba7f7;
+  border: 1px solid currentColor;
+}
+
+.dateCell {
+  color: var(--white-dim);
+  opacity: 0.8;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.deleteBtn {
+  font-size: 0.8rem;
+  color: var(--white-dim);
+  transition: color var(--transition);
+  cursor: pointer;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.deleteBtn:hover {
+  color: #ff8890;
+}
+
+.deleteBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}
+
+.noData {
+  text-align: center;
+  color: var(--white-dim);
+  padding: 48px 0;
+}
+
+/* Modal Form styling */
+.modalBackdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(9, 9, 15, 0.8);
+  backdrop-filter: blur(4px);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  animation: fadeIn 0.2s ease;
+}
+
+.modalCard {
+  width: 100%;
+  max-width: 480px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-card);
+  display: flex;
+  flex-direction: column;
+}
+
+.modalHeader {
+  padding: 24px 32px;
+  border-bottom: 1px solid var(--border);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modalHeader h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  letter-spacing: 0.05em;
+  color: var(--white);
+}
+
+.modalClose {
+  color: var(--white-dim);
+  font-size: 1.1rem;
+  background: none;
+  border: none;
+  cursor: pointer;
+}
+
+.modalClose:hover {
+  color: var(--crimson);
+}
+
+.form {
+  padding: 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.formField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.formField label {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+}
+
+.formField input {
+  background: var(--bg-base);
+  border: 1px solid var(--border);
+  color: var(--white);
+  padding: 10px 14px;
+  border-radius: var(--radius);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  transition: border-color var(--transition);
+}
+
+.formField input:focus {
+  outline: none;
+  border-color: var(--crimson);
+}
+
+.formActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  border-top: 1px solid var(--border);
+  padding-top: 24px;
+  margin-top: 12px;
+}
+
+.loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  color: var(--white-dim);
+  gap: 12px;
+}
+
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 2px solid var(--white-faint);
+  border-top-color: var(--crimson);
+  border-radius: 50%;
+  animation: spin 1s infinite linear;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}

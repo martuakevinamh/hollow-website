@@ -1,0 +1,287 @@
+.joinHero {
+  position: relative;
+  padding: 160px 0 100px;
+  overflow: hidden;
+  text-align: center;
+}
+
+.joinHeroBg { position: absolute; inset: 0; }
+
+.joinHeroOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(9,9,15,0.85) 0%, rgba(9,9,15,0.75) 50%, rgba(9,9,15,1) 100%);
+}
+
+.joinHeroContent {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.joinLogo {
+  filter: drop-shadow(0 0 20px rgba(178,34,52,0.5));
+  margin-bottom: 8px;
+}
+
+.joinTitle {
+  font-family: var(--font-display);
+  font-size: clamp(3rem, 8vw, 6rem);
+  font-weight: 900;
+  color: var(--white);
+  line-height: 1;
+  text-shadow: 0 4px 30px rgba(0,0,0,0.8);
+}
+
+.joinSubtitle {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--white-dim);
+  max-width: 400px;
+}
+
+.discordBtn {
+  margin-top: 16px;
+  font-size: 1rem !important;
+  padding: 16px 40px !important;
+  box-shadow: 0 0 40px rgba(178,34,52,0.4) !important;
+  animation: pulse-glow 3s infinite;
+}
+
+/* Steps */
+.stepsSection {
+  padding: var(--section-pad) 0;
+  background: var(--bg-base);
+}
+
+.stepsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  position: relative;
+}
+
+.stepCard {
+  position: relative;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 32px 24px;
+  text-align: center;
+  transition: all var(--transition);
+}
+
+.stepCard:hover {
+  border-color: var(--border-accent);
+  transform: translateY(-6px);
+  box-shadow: var(--shadow-crimson);
+}
+
+.stepNumber {
+  font-family: var(--font-display);
+  font-size: 3rem;
+  font-weight: 900;
+  color: var(--crimson);
+  opacity: 0.3;
+  line-height: 1;
+  margin-bottom: 12px;
+}
+
+.stepIcon {
+  font-size: 2rem;
+  margin-bottom: 12px;
+}
+
+.stepTitle {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: var(--white);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  margin-bottom: 8px;
+}
+
+.stepDesc {
+  color: var(--white-dim);
+  font-size: 0.8rem;
+  line-height: 1.6;
+}
+
+.stepArrow {
+  position: absolute;
+  right: -20px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--crimson);
+  font-size: 1.5rem;
+  z-index: 1;
+  opacity: 0.5;
+}
+
+/* Requirements */
+.reqSection {
+  padding: var(--section-pad) 0;
+  background: #0a0a12;
+  position: relative;
+}
+
+.reqBg {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 30% 50%, rgba(178,34,52,0.04) 0%, transparent 60%);
+  pointer-events: none;
+}
+
+.reqGrid {
+  display: grid;
+  grid-template-columns: 3fr 2fr;
+  gap: 64px;
+  align-items: start;
+}
+
+.reqText {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.reqTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.8rem, 4vw, 2.8rem);
+  font-weight: 800;
+  color: var(--white);
+}
+
+.reqTitle span { color: var(--crimson); }
+
+.reqDesc {
+  color: var(--white-dim);
+  font-size: 0.95rem;
+  line-height: 1.75;
+}
+
+.reqList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.reqItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: var(--white-dim);
+  font-size: 0.9rem;
+  padding: 12px 16px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  transition: all var(--transition);
+}
+
+.reqItem:hover {
+  border-color: var(--border-accent);
+  color: var(--white);
+}
+
+.reqCheck {
+  color: var(--crimson);
+  font-weight: 700;
+  font-size: 0.85rem;
+  flex-shrink: 0;
+}
+
+.reqCard {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  position: sticky;
+  top: 100px;
+}
+
+.reqCardHeader {
+  background: linear-gradient(135deg, var(--crimson-dark), var(--navy-dark));
+  padding: 28px;
+  border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.reqCardHeader h3 {
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  color: var(--white);
+  margin-bottom: 8px;
+}
+
+.reqCardHeader p {
+  color: rgba(245,245,245,0.7);
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.reqCardBody {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.discordPreview {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 14px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+}
+
+.discordIcon { font-size: 1.8rem; }
+
+.discordName {
+  font-family: var(--font-display);
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--white);
+}
+
+.discordServer {
+  font-size: 0.7rem;
+  color: #22c55e;
+  margin-top: 2px;
+}
+
+.onlineDot {
+  width: 10px;
+  height: 10px;
+  background: #22c55e;
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(34,197,94,0.5);
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.reqNote {
+  font-size: 0.75rem;
+  color: rgba(245,245,245,0.35);
+  text-align: center;
+  line-height: 1.5;
+}
+
+@media (max-width: 1024px) {
+  .stepsGrid { grid-template-columns: repeat(2, 1fr); }
+  .stepArrow { display: none; }
+  .reqGrid { grid-template-columns: 1fr; gap: 40px; }
+  .reqCard { position: static; }
+}
+
+@media (max-width: 640px) {
+  .stepsGrid { grid-template-columns: 1fr; }
+}
