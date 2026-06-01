@@ -19,10 +19,6 @@ function AdminProtectedContent({ children }: { children: React.ReactNode }) {
     }
   }, [user, loading, router, pathname]);
 
-  // Close sidebar on navigation change (mobile)
-  useEffect(() => {
-    setSidebarOpen(false);
-  }, [pathname]);
 
   if (pathname === '/admin/login') {
     return <>{children}</>;
@@ -118,6 +114,7 @@ function AdminProtectedContent({ children }: { children: React.ReactNode }) {
             <Link
               key={item.href}
               href={item.href}
+              onClick={() => setSidebarOpen(false)}
               className={`${styles.navItem} ${
                 pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href))
                   ? styles.active
