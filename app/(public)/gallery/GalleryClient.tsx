@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import { SAMPLogo, FiveMLogo } from '@/components/ServerLogos';
 import type { GalleryItem } from '@/lib/supabase';
 import styles from './lightbox.module.css';
 
@@ -90,13 +91,13 @@ export function GalleryGrid({ items }: GalleryGridProps) {
           onClick={() => setActiveTab('samp')}
           className={`${styles.tabBtn} ${activeTab === 'samp' ? styles.active : ''}`}
         >
-          🎮 GTA SA:MP
+          <SAMPLogo size={18} /> GTA SA:MP
         </button>
         <button
           onClick={() => setActiveTab('fivem')}
           className={`${styles.tabBtn} ${activeTab === 'fivem' ? styles.active : ''}`}
         >
-          🚗 GTA FiveM
+          <FiveMLogo size={18} /> GTA FiveM
         </button>
       </div>
 

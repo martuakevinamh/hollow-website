@@ -11,6 +11,9 @@ import {
   ImagePlus,
   FilePlus,
   AlertTriangle,
+  HardDrive,
+  CheckCircle2,
+  XCircle,
 } from 'lucide-react';
 import styles from './dashboard.module.css';
 
@@ -22,6 +25,8 @@ export default function AdminDashboard() {
   });
   const [loading, setLoading] = useState(true);
   const [dbConfigured, setDbConfigured] = useState(true);
+  const [storageSetup, setStorageSetup] = useState<'idle' | 'loading' | 'done' | 'error'>('idle');
+  const [storageResults, setStorageResults] = useState<{ bucket: string; status: string; message: string }[]>([]);
 
   useEffect(() => {
     async function fetchStats() {
@@ -56,6 +61,19 @@ export default function AdminDashboard() {
 
     fetchStats();
   }, []);
+
+  async function handleSetupStorage() {
+    setStorageSetup('loading');
+    try {
+      const res = await fetch('/api/admin/setup-storage', { method: 'POST' });
+      const json = await res.json();
+      setStorageResults(json.results || []);
+      setStorageSetup(res.ok ? 'done' : 'error');
+    } catch {
+      setStorageSetup('error');
+      setStorageResults([{ bucket: 'unknown', status: 'error', message: 'Network error — check server logs.' }]);
+    }
+  }
 
   if (loading) {
     return (
@@ -120,6 +138,36 @@ export default function AdminDashboard() {
             <span>Publish Article</span>
           </Link>
         </div>
+      </div>
+
+      {/* Storage Setup */}
+      <div className={styles.systemInfo}>
+        <h3 className={styles.sectionTitle}>Storage Setup</h3>
+        <p style={{ fontSize: '0.85rem', color: 'var(--white-dim)', marginBottom: '16px' }}>
+          Jalankan sekali untuk membuat bucket <code>gallery-images</code> dan <code>member-photos</code> di Supabase Storage.
+        </p>
+        <button
+          onClick={handleSetupStorage}
+          disabled={storageSetup === 'loading'}
+          className="btn btn-outline"
+          style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '0.85rem' }}
+        >
+          <HardDrive size={16} />
+          {storageSetup === 'loading' ? 'Creating buckets...' : 'Setup Storage Buckets'}
+        </button>
+        {storageResults.length > 0 && (
+          <div style={{ marginTop: '16px', display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            {storageResults.map((r) => (
+              <div key={r.bucket} style={{ display: 'flex', alignItems: 'center', gap: '10px', fontSize: '0.85rem' }}>
+                {r.status === 'error'
+                  ? <XCircle size={16} color="#ff4d6d" />
+                  : <CheckCircle2 size={16} color="#4ade80" />}
+                <code style={{ color: 'var(--white)' }}>{r.bucket}</code>
+                <span style={{ color: 'var(--white-dim)' }}>— {r.message}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* System Information */}

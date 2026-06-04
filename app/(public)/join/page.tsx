@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { connection } from 'next/server';
+import { MessageSquare, BookOpen, UserCheck, Gamepad2 } from 'lucide-react';
 import styles from './join.module.css';
 import { getSettings } from '@/lib/supabase';
 
@@ -14,25 +15,25 @@ const steps = [
     step: '01',
     title: 'Join Discord',
     desc: 'Klik tombol di bawah untuk bergabung ke server Discord resmi Hollow.',
-    icon: '🎮',
+    Icon: MessageSquare,
   },
   {
     step: '02',
     title: 'Baca Rules',
     desc: 'Baca dan pahami semua peraturan komunitas yang tersedia di channel #rules.',
-    icon: '📜',
+    Icon: BookOpen,
   },
   {
     step: '03',
     title: 'Perkenalkan Diri',
     desc: 'Perkenalkan dirimu di channel #perkenalan dan ceritakan pengalaman RP-mu.',
-    icon: '👋',
+    Icon: UserCheck,
   },
   {
     step: '04',
     title: 'Mulai Roleplay',
     desc: 'Setelah diverifikasi, kamu siap bergabung dalam aksi di server SAMP atau FiveM!',
-    icon: '🚀',
+    Icon: Gamepad2,
   },
 ];
 
@@ -103,7 +104,9 @@ export default async function JoinPage() {
             {steps.map((step, i) => (
               <div key={step.step} className={styles.stepCard}>
                 <div className={styles.stepNumber}>{step.step}</div>
-                <div className={styles.stepIcon}>{step.icon}</div>
+                <div className={styles.stepIcon}>
+                  <step.Icon size={32} strokeWidth={1.5} />
+                </div>
                 <h3 className={styles.stepTitle}>{step.title}</h3>
                 <p className={styles.stepDesc}>{step.desc}</p>
                 {i < steps.length - 1 && <div className={styles.stepArrow}>→</div>}
@@ -141,7 +144,9 @@ export default async function JoinPage() {
               </div>
               <div className={styles.reqCardBody}>
                 <div className={styles.discordPreview}>
-                  <div className={styles.discordIcon}>🎮</div>
+                  <div className={styles.discordIcon}>
+                    <MessageSquare size={28} strokeWidth={1.5} color="#5865F2" />
+                  </div>
                   <div>
                     <div className={styles.discordName}>Hollow</div>
                     <div className={styles.discordServer}>Official Discord Server</div>

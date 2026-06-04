@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { SAMPLogo, FiveMLogo } from '@/components/ServerLogos';
 import { type NewsItem } from '@/lib/supabase';
 import styles from './news.module.css';
 
@@ -37,13 +38,13 @@ export default function NewsList({ initialNews }: NewsListProps) {
           onClick={() => setActiveTab('samp')}
           className={`${styles.tabBtn} ${activeTab === 'samp' ? styles.active : ''}`}
         >
-          🎮 GTA SA:MP
+          <SAMPLogo size={18} /> GTA SA:MP
         </button>
         <button
           onClick={() => setActiveTab('fivem')}
           className={`${styles.tabBtn} ${activeTab === 'fivem' ? styles.active : ''}`}
         >
-          🚗 GTA FiveM
+          <FiveMLogo size={18} /> GTA FiveM
         </button>
       </div>
 

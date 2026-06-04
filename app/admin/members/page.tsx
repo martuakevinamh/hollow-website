@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase, type Member } from '@/lib/supabase';
 import Image from 'next/image';
+import { UserPlus, Edit2, Trash2, User, Camera } from 'lucide-react';
 import styles from './members-admin.module.css';
 
 const RANKS = ['TOP OG/KING', 'OG', 'Top Boy', 'Brudda', 'Rude Boy', 'The Youth', 'Muscle'];
@@ -246,14 +247,14 @@ export default function MembersAdmin() {
             className={styles.selectInput}
           >
             <option value="">All Servers</option>
-            <option value="samp">🎮 GTA SAMP</option>
-            <option value="fivem">🚗 GTA FiveM</option>
-            <option value="both">🌐 Both</option>
+            <option value="samp">GTA SAMP</option>
+            <option value="fivem">GTA FiveM</option>
+            <option value="both">Both</option>
           </select>
         </div>
 
-        <button onClick={handleAddOpen} className="btn btn-primary">
-          ➕ Add Member
+        <button onClick={handleAddOpen} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <UserPlus size={18} /> Add Member
         </button>
       </div>
 
@@ -332,10 +333,10 @@ export default function MembersAdmin() {
                     <td>
                       <div className={styles.actions}>
                         <button onClick={() => handleEditOpen(member)} className={styles.editBtn}>
-                          ✏️ Edit
+                          <Edit2 size={16} /> Edit
                         </button>
                         <button onClick={() => handleDelete(member.id)} className={styles.deleteBtn}>
-                          🗑️ Delete
+                          <Trash2 size={16} /> Delete
                         </button>
                       </div>
                     </td>
@@ -370,7 +371,9 @@ export default function MembersAdmin() {
                       sizes="80px"
                     />
                   ) : (
-                    <div className={styles.previewFallback}>👤</div>
+                    <div className={styles.previewFallback}>
+                      <User size={32} strokeWidth={1.5} color="var(--white-dim)" />
+                    </div>
                   )}
                 </div>
                 <div className={styles.uploadControls}>
@@ -385,10 +388,10 @@ export default function MembersAdmin() {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     className="btn btn-outline"
-                    style={{ padding: '8px 16px', fontSize: '0.75rem' }}
+                    style={{ padding: '8px 16px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}
                     disabled={uploading}
                   >
-                    {uploading ? 'Uploading...' : 'Upload Photo'}
+                    <Camera size={16} /> {uploading ? 'Uploading...' : 'Upload Photo'}
                   </button>
                   <p className={styles.uploadHint}>JPG or PNG. Max size 2MB.</p>
                 </div>

@@ -100,8 +100,16 @@
 }
 
 .stepIcon {
-  font-size: 2rem;
-  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: rgba(178, 34, 52, 0.1);
+  border: 1px solid rgba(178, 34, 52, 0.2);
+  color: var(--crimson);
+  margin: 0 auto 16px;
 }
 
 .stepTitle {

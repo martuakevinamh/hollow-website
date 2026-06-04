@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase, type NewsItem } from '@/lib/supabase';
 import Image from 'next/image';
+import { FilePlus, Edit2, Trash2, Newspaper, ImagePlus } from 'lucide-react';
 import styles from './news-admin.module.css';
 
 export default function NewsAdmin() {
@@ -68,8 +69,8 @@ export default function NewsAdmin() {
       } else {
         setNews(data || []);
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred fetching news');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred fetching news');
     } finally {
       setLoading(false);
     }
@@ -147,8 +148,8 @@ export default function NewsAdmin() {
         .getPublicUrl(filePath);
 
       setCoverUrl(data.publicUrl);
-    } catch (err: any) {
-      setError(err.message || 'Failed to upload cover image');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to upload cover image');
     } finally {
       setUploading(false);
     }
@@ -187,8 +188,8 @@ export default function NewsAdmin() {
 
       setIsFormOpen(false);
       fetchNews();
-    } catch (err: any) {
-      setError(err.message || 'Failed to save news article');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to save news article');
     }
   };
 
@@ -201,8 +202,8 @@ export default function NewsAdmin() {
 
       if (error) throw error;
       fetchNews();
-    } catch (err: any) {
-      setError(err.message || 'Failed to toggle publication status');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to toggle publication status');
     }
   };
 
@@ -219,8 +220,8 @@ export default function NewsAdmin() {
 
       if (error) throw error;
       fetchNews();
-    } catch (err: any) {
-      setError(err.message || 'Failed to delete article');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to delete article');
     }
   };
 
@@ -266,8 +267,8 @@ export default function NewsAdmin() {
             <option value="both">Both</option>
           </select>
         </div>
-        <button onClick={handleAddOpen} className="btn btn-primary">
-          ➕ Publish Article
+        <button onClick={handleAddOpen} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <FilePlus size={18} /> Publish Article
         </button>
       </div>
 
@@ -312,7 +313,9 @@ export default function NewsAdmin() {
                             sizes="60px"
                           />
                         ) : (
-                          <div className={styles.coverFallback}>📰</div>
+                          <div className={styles.coverFallback}>
+                            <Newspaper size={20} strokeWidth={1.5} color="var(--white-dim)" />
+                          </div>
                         )}
                       </div>
                     </td>
@@ -343,10 +346,10 @@ export default function NewsAdmin() {
                     <td>
                       <div className={styles.actions}>
                         <button onClick={() => handleEditOpen(item)} className={styles.editBtn}>
-                          ✏️ Edit
+                          <Edit2 size={16} /> Edit
                         </button>
                         <button onClick={() => handleDelete(item.id)} className={styles.deleteBtn}>
-                          🗑️ Delete
+                          <Trash2 size={16} /> Delete
                         </button>
                       </div>
                     </td>
@@ -381,7 +384,9 @@ export default function NewsAdmin() {
                       sizes="160px"
                     />
                   ) : (
-                    <div className={styles.previewFallback}>📰</div>
+                    <div className={styles.previewFallback}>
+                      <Newspaper size={32} strokeWidth={1.5} color="var(--white-dim)" />
+                    </div>
                   )}
                 </div>
                 <div className={styles.uploadControls}>
@@ -396,10 +401,10 @@ export default function NewsAdmin() {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     className="btn btn-outline"
-                    style={{ padding: '8px 16px', fontSize: '0.75rem' }}
+                    style={{ padding: '8px 16px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}
                     disabled={uploading}
                   >
-                    {uploading ? 'Uploading...' : 'Upload Cover Image'}
+                    <ImagePlus size={16} /> {uploading ? 'Uploading...' : 'Upload Cover Image'}
                   </button>
                   <p className={styles.uploadHint}>Recommmended 16:9 ratio. JPG or PNG. Max size 2MB.</p>
                 </div>

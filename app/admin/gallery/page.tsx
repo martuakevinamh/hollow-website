@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase, type GalleryItem } from '@/lib/supabase';
 import Image from 'next/image';
+import { ImagePlus, Trash2, Camera } from 'lucide-react';
 import styles from './gallery-admin.module.css';
 
 export default function GalleryAdmin() {
@@ -37,8 +38,8 @@ export default function GalleryAdmin() {
       } else {
         setItems(data || []);
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred fetching gallery');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred fetching gallery');
     } finally {
       setLoading(false);
     }
@@ -78,8 +79,8 @@ export default function GalleryAdmin() {
         .getPublicUrl(filePath);
 
       setImageUrl(data.publicUrl);
-    } catch (err: any) {
-      setError(err.message || 'Failed to upload photo');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to upload photo');
     } finally {
       setUploading(false);
     }
@@ -101,8 +102,8 @@ export default function GalleryAdmin() {
 
       setIsFormOpen(false);
       fetchGallery();
-    } catch (err: any) {
-      setError(err.message || 'Failed to save gallery item');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to save gallery item');
     }
   };
 
@@ -134,8 +135,8 @@ export default function GalleryAdmin() {
       }
 
       fetchGallery();
-    } catch (err: any) {
-      setError(err.message || 'Failed to delete photo');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to delete photo');
     }
   };
 
@@ -178,8 +179,8 @@ export default function GalleryAdmin() {
             <option value="both">Both</option>
           </select>
         </div>
-        <button onClick={handleAddOpen} className="btn btn-primary">
-          ➕ Upload Photo
+        <button onClick={handleAddOpen} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <ImagePlus size={18} /> Upload Photo
         </button>
       </div>
 
@@ -210,7 +211,7 @@ export default function GalleryAdmin() {
                     className={styles.deleteBtn}
                     title="Delete photo"
                   >
-                    🗑️
+                    <Trash2 size={16} />
                   </button>
                 </div>
                 <div className={styles.cardBody}>
@@ -272,7 +273,9 @@ export default function GalleryAdmin() {
                     onClick={() => fileInputRef.current?.click()}
                     className={styles.dropzone}
                   >
-                    <span className={styles.dropzoneIcon}>📸</span>
+                    <span className={styles.dropzoneIcon}>
+                      <Camera size={32} strokeWidth={1.5} color="var(--white-dim)" />
+                    </span>
                     <span className={styles.dropzoneText}>
                       {uploading ? 'Uploading image...' : 'Click to select image file'}
                     </span>
