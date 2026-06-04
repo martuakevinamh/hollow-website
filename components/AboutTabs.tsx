@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { SAMPLogo, FiveMLogo } from '@/components/ServerLogos';
 import styles from './AboutTabs.module.css';
 import { type SiteSettings, DEFAULT_SETTINGS } from '@/lib/supabase';
 
@@ -15,13 +16,13 @@ export default function AboutTabs({ settings }: { settings?: SiteSettings }) {
           onClick={() => setActiveTab('samp')}
           className={`${styles.tabBtn} ${activeTab === 'samp' ? styles.active : ''}`}
         >
-          🎮 GTA SA:MP
+          <SAMPLogo size={18} /> GTA SA:MP
         </button>
         <button
           onClick={() => setActiveTab('fivem')}
           className={`${styles.tabBtn} ${activeTab === 'fivem' ? styles.active : ''}`}
         >
-          🚗 GTA FiveM
+          <FiveMLogo size={18} /> GTA FiveM
         </button>
       </div>
 

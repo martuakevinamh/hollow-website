@@ -220,6 +220,45 @@
   background: #000;
 }
 
+.previewGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 12px;
+  width: 100%;
+}
+
+.previewItem {
+  position: relative;
+  aspect-ratio: 1;
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.removePreviewBtn {
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  background: rgba(9, 9, 15, 0.8);
+  border: 1px solid var(--border);
+  color: #ff8890;
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  z-index: 2;
+  transition: all var(--transition);
+}
+
+.removePreviewBtn:hover {
+  background: var(--crimson);
+  color: var(--white);
+  border-color: var(--crimson);
+}
+
 .formField {
   display: flex;
   flex-direction: column;

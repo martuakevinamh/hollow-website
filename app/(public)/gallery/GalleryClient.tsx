@@ -1,8 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { SAMPLogo, FiveMLogo } from '@/components/ServerLogos';
+import { Play, Pause } from 'lucide-react';
 import type { GalleryItem } from '@/lib/supabase';
 import styles from './lightbox.module.css';
 
@@ -14,9 +15,20 @@ interface LightboxProps {
 
 export function Lightbox({ items, initialIndex, onClose }: LightboxProps) {
   const [current, setCurrent] = useState(initialIndex);
+  const [isPlaying, setIsPlaying] = useState(true);
 
-  const prev = () => setCurrent((c) => (c - 1 + items.length) % items.length);
-  const next = () => setCurrent((c) => (c + 1) % items.length);
+  const prev = useCallback(() => setCurrent((c) => (c - 1 + items.length) % items.length), [items.length]);
+  const next = useCallback(() => setCurrent((c) => (c + 1) % items.length), [items.length]);
+
+  useEffect(() => {
+    if (!isPlaying || items.length <= 1) return;
+
+    const timer = setInterval(() => {
+      next();
+    }, 4000); // 4 seconds delay between slides
+
+    return () => clearInterval(timer);
+  }, [isPlaying, items.length, next, current]);
 
   const item = items[current];
 
@@ -63,7 +75,18 @@ export function Lightbox({ items, initialIndex, onClose }: LightboxProps) {
         {/* Caption */}
         <div className={styles.caption}>
           <span className={styles.captionTitle}>{item.title}</span>
-          <span className={styles.captionCount}>{current + 1} / {items.length}</span>
+          <div style={{ display: 'flex', gap: '16px', alignItems: 'center' }}>
+            {items.length > 1 && (
+              <button
+                className={styles.playPauseBtn}
+                onClick={() => setIsPlaying(!isPlaying)}
+                title={isPlaying ? "Pause Slideshow" : "Play Slideshow"}
+              >
+                {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+              </button>
+            )}
+            <span className={styles.captionCount}>{current + 1} / {items.length}</span>
+          </div>
         </div>
       </div>
     </div>

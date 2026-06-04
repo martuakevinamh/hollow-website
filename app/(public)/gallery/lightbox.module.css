@@ -188,6 +188,21 @@
   color: var(--white-dim);
 }
 
+.playPauseBtn {
+  background: none;
+  border: none;
+  color: var(--white-dim);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: color var(--transition);
+}
+
+.playPauseBtn:hover {
+  color: var(--crimson);
+}
+
 /* Tab Buttons */
 .tabButtons {
   display: flex;

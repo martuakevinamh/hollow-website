@@ -2,6 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { connection } from 'next/server';
+import { Crown, Bird, Target, Handshake, Flame, Zap, Dumbbell, ShieldCheck, ScrollText, Users } from 'lucide-react';
 import AboutTabs from '@/components/AboutTabs';
 import styles from './about.module.css';
 import { getSettings } from '@/lib/supabase';
@@ -12,20 +13,20 @@ export const metadata: Metadata = {
 };
 
 const hierarchy = [
-  { rank: 'TOP OG / KING', icon: '👑', color: '#FFD700', desc: 'Pendiri atau legend geng. High commander yang dihormati di seluruh block — pelaku utama di balik segala operasi.' },
-  { rank: 'OG',            icon: '🦅', color: '#C0C0C0', desc: 'Original Gangsta. Senior berpengaruh, mantan Top Boy yang kini jadi panutan dan penasihat generasi bawah.' },
-  { rank: 'Top Boy',       icon: '🎯', color: '#B22234', desc: 'Pemimpin area atau blok. Bertanggung jawab atas operasi dan anggota di bawah kendalinya.' },
-  { rank: 'Brudda',        icon: '🤜', color: '#7ba7f7', desc: 'Anggota resmi geng. Loyal, sudah teruji, dan dianggap keluarga oleh seluruh block.' },
-  { rank: 'Rude Boy',      icon: '🔥', color: '#f7a07b', desc: 'Pemuda aktif di jalan — keras, ambisius, dan mulai mendapat rasa hormat dari sesama.' },
-  { rank: 'The Youth',     icon: '⚡', color: '#86efac', desc: 'Anak muda yang baru mulai ikut kegiatan geng dan belajar kode jalanan Hollow.' },
-  { rank: 'Muscle',        icon: '💪', color: '#a0aec0', desc: 'Sering nongkrong bareng geng, belum resmi jadi anggota tapi sudah membuktikan kehadiran di block.' },
+  { rank: 'TOP OG / KING', icon: <Crown size={32} strokeWidth={1.5} />, color: '#FFD700', desc: 'Pendiri atau legend geng. High commander yang dihormati di seluruh block — pelaku utama di balik segala operasi.' },
+  { rank: 'OG',            icon: <Bird size={32} strokeWidth={1.5} />, color: '#C0C0C0', desc: 'Original Gangsta. Senior berpengaruh, mantan Top Boy yang kini jadi panutan dan penasihat generasi bawah.' },
+  { rank: 'Top Boy',       icon: <Target size={32} strokeWidth={1.5} />, color: '#B22234', desc: 'Pemimpin area atau blok. Bertanggung jawab atas operasi dan anggota di bawah kendalinya.' },
+  { rank: 'Brudda',        icon: <Handshake size={32} strokeWidth={1.5} />, color: '#7ba7f7', desc: 'Anggota resmi geng. Loyal, sudah teruji, dan dianggap keluarga oleh seluruh block.' },
+  { rank: 'Rude Boy',      icon: <Flame size={32} strokeWidth={1.5} />, color: '#f7a07b', desc: 'Pemuda aktif di jalan — keras, ambisius, dan mulai mendapat rasa hormat dari sesama.' },
+  { rank: 'The Youth',     icon: <Zap size={32} strokeWidth={1.5} />, color: '#86efac', desc: 'Anak muda yang baru mulai ikut kegiatan geng dan belajar kode jalanan Hollow.' },
+  { rank: 'Muscle',        icon: <Dumbbell size={32} strokeWidth={1.5} />, color: '#a0aec0', desc: 'Sering nongkrong bareng geng, belum resmi jadi anggota tapi sudah membuktikan kehadiran di block.' },
 ];
 
 const values = [
-  { title: 'Loyalty', desc: 'Loyalitas adalah fondasi utama. Pengkhianatan tidak akan pernah ditoleransi di Hollow.', icon: '🤝' },
-  { title: 'Respect', desc: 'Hormati setiap anggota — dari Associate hingga Boss. Rasa hormat membangun kesolidan.', icon: '🫡' },
-  { title: 'Code', desc: 'Kami hidup dengan kode. Ada aturan yang tidak boleh dilanggar demi menjaga nama Hollow.', icon: '📜' },
-  { title: 'Brotherhood', desc: 'Lebih dari sekedar gang — kami adalah saudara yang saling jaga satu sama lain.', icon: '👥' },
+  { title: 'Loyalty', desc: 'Loyalitas adalah fondasi utama. Pengkhianatan tidak akan pernah ditoleransi di Hollow.', icon: <Handshake size={36} strokeWidth={1.5} color="var(--crimson)" /> },
+  { title: 'Respect', desc: 'Hormati setiap anggota — dari Associate hingga Boss. Rasa hormat membangun kesolidan.', icon: <ShieldCheck size={36} strokeWidth={1.5} color="var(--crimson)" /> },
+  { title: 'Code', desc: 'Kami hidup dengan kode. Ada aturan yang tidak boleh dilanggar demi menjaga nama Hollow.', icon: <ScrollText size={36} strokeWidth={1.5} color="var(--crimson)" /> },
+  { title: 'Brotherhood', desc: 'Lebih dari sekedar gang — kami adalah saudara yang saling jaga satu sama lain.', icon: <Users size={36} strokeWidth={1.5} color="var(--crimson)" /> },
 ];
 
 export default async function AboutPage() {

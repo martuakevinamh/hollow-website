@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase, type GalleryItem } from '@/lib/supabase';
 import Image from 'next/image';
-import { ImagePlus, Trash2, Camera } from 'lucide-react';
+import { ImagePlus, Trash2, Camera, X } from 'lucide-react';
 import styles from './gallery-admin.module.css';
 
 export default function GalleryAdmin() {
@@ -18,7 +18,7 @@ export default function GalleryAdmin() {
   const [title, setTitle] = useState('');
   const [server, setServer] = useState<'samp' | 'fivem' | 'both'>('samp');
   const [uploading, setUploading] = useState(false);
-  const [imageUrl, setImageUrl] = useState<string | null>(null);
+  const [selectedFiles, setSelectedFiles] = useState<{ file: File; preview: string }[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -48,62 +48,80 @@ export default function GalleryAdmin() {
   const handleAddOpen = () => {
     setTitle('');
     setServer('samp');
-    setImageUrl(null);
+    setSelectedFiles([]);
     setIsFormOpen(true);
   };
 
-  const handlePhotoUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    try {
-      setUploading(true);
-      setError('');
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (!e.target.files || e.target.files.length === 0) return;
+    
+    const newFiles = Array.from(e.target.files).map(file => ({
+      file,
+      preview: URL.createObjectURL(file)
+    }));
+    
+    setSelectedFiles(prev => [...prev, ...newFiles]);
+  };
 
-      if (!e.target.files || e.target.files.length === 0) {
-        return;
-      }
-
-      const file = e.target.files[0];
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-      const filePath = `${fileName}`;
-
-      // Upload file to Supabase Storage bucket 'gallery-images'
-      const { error: uploadError } = await supabase.storage
-        .from('gallery-images')
-        .upload(filePath, file);
-
-      if (uploadError) throw uploadError;
-
-      // Get public URL
-      const { data } = supabase.storage
-        .from('gallery-images')
-        .getPublicUrl(filePath);
-
-      setImageUrl(data.publicUrl);
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to upload photo');
-    } finally {
-      setUploading(false);
-    }
+  const removeSelectedFile = (index: number) => {
+    setSelectedFiles(prev => {
+      const newFiles = [...prev];
+      URL.revokeObjectURL(newFiles[index].preview);
+      newFiles.splice(index, 1);
+      return newFiles;
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!imageUrl) {
-      setError('Please upload a photo first');
+    if (selectedFiles.length === 0) {
+      setError('Please select at least one photo');
       return;
     }
 
     try {
-      const { error } = await supabase
-        .from('gallery')
-        .insert([{ title, image_url: imageUrl, server }]);
+      setUploading(true);
+      setError('');
+      const uploadedRecords = [];
 
-      if (error) throw error;
+      // Loop through all selected files and upload them
+      for (const { file } of selectedFiles) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        // Upload file to Supabase Storage bucket 'gallery-images'
+        const { error: uploadError } = await supabase.storage
+          .from('gallery-images')
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        // Get public URL
+        const { data } = supabase.storage
+          .from('gallery-images')
+          .getPublicUrl(filePath);
+
+        uploadedRecords.push({
+          title,
+          image_url: data.publicUrl,
+          server
+        });
+      }
+
+      // Insert all records at once into the database
+      const { error: dbError } = await supabase
+        .from('gallery')
+        .insert(uploadedRecords);
+
+      if (dbError) throw dbError;
 
       setIsFormOpen(false);
       fetchGallery();
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Failed to save gallery item');
+      setError(err instanceof Error ? err.message : 'Failed to save gallery items');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -259,46 +277,48 @@ export default function GalleryAdmin() {
 
             <form onSubmit={handleSubmit} className={styles.form}>
               <div className={styles.uploadBox}>
-                {imageUrl ? (
-                  <div className={styles.previewWrapper}>
-                    <Image
-                      src={imageUrl}
-                      alt="Uploaded preview"
-                      fill
-                      style={{ objectFit: 'contain' }}
-                    />
-                  </div>
-                ) : (
-                  <div
-                    onClick={() => fileInputRef.current?.click()}
-                    className={styles.dropzone}
-                  >
-                    <span className={styles.dropzoneIcon}>
-                      <Camera size={32} strokeWidth={1.5} color="var(--white-dim)" />
-                    </span>
-                    <span className={styles.dropzoneText}>
-                      {uploading ? 'Uploading image...' : 'Click to select image file'}
-                    </span>
-                  </div>
-                )}
+                <div
+                  onClick={() => fileInputRef.current?.click()}
+                  className={styles.dropzone}
+                >
+                  <span className={styles.dropzoneIcon}>
+                    <Camera size={32} strokeWidth={1.5} color="var(--white-dim)" />
+                  </span>
+                  <span className={styles.dropzoneText}>
+                    {uploading ? 'Uploading images...' : 'Click to select multiple images'}
+                  </span>
+                </div>
 
                 <input
                   type="file"
                   ref={fileInputRef}
-                  onChange={handlePhotoUpload}
+                  onChange={handleFileSelect}
                   accept="image/*"
+                  multiple
                   style={{ display: 'none' }}
                 />
 
-                {imageUrl && (
-                  <button
-                    type="button"
-                    onClick={() => setImageUrl(null)}
-                    className="btn btn-outline"
-                    style={{ marginTop: '12px', padding: '6px 12px', fontSize: '0.75rem' }}
-                  >
-                    Replace Photo
-                  </button>
+                {selectedFiles.length > 0 && (
+                  <div className={styles.previewGrid}>
+                    {selectedFiles.map((sf, idx) => (
+                      <div key={idx} className={styles.previewItem}>
+                        <Image
+                          src={sf.preview}
+                          alt="preview"
+                          fill
+                          style={{ objectFit: 'cover' }}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => removeSelectedFile(idx)}
+                          className={styles.removePreviewBtn}
+                          disabled={uploading}
+                        >
+                          <X size={14} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
                 )}
               </div>
 
@@ -342,8 +362,8 @@ export default function GalleryAdmin() {
                 >
                   Cancel
                 </button>
-                <button type="submit" className="btn btn-primary" disabled={!imageUrl}>
-                  Save to Gallery
+                <button type="submit" className="btn btn-primary" disabled={selectedFiles.length === 0 || uploading}>
+                  {uploading ? 'Uploading...' : 'Upload All Photos'}
                 </button>
               </div>
             </form>

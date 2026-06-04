@@ -31,6 +31,7 @@ export default function MembersAdmin() {
     rank: 'Muscle',
     server: 'samp' as 'samp' | 'fivem' | 'both',
     bio: '',
+    image_position: 'center center',
     joined_at: new Date().toISOString().split('T')[0],
     is_active: true,
   });
@@ -76,6 +77,7 @@ export default function MembersAdmin() {
       rank: 'Muscle',
       server: 'samp',
       bio: '',
+      image_position: 'center center',
       joined_at: new Date().toISOString().split('T')[0],
       is_active: true,
     });
@@ -91,6 +93,7 @@ export default function MembersAdmin() {
       rank: member.rank,
       server: member.server,
       bio: member.bio || '',
+      image_position: member.image_position || 'center center',
       joined_at: new Date(member.joined_at).toISOString().split('T')[0],
       is_active: member.is_active,
     });
@@ -146,6 +149,7 @@ export default function MembersAdmin() {
       server: form.server,
       bio: form.bio || null,
       photo_url: photoUrl,
+      image_position: form.image_position,
       joined_at: new Date(form.joined_at).toISOString(),
       is_active: form.is_active,
     };
@@ -367,7 +371,7 @@ export default function MembersAdmin() {
                       src={photoUrl}
                       alt="Avatar Preview"
                       fill
-                      style={{ objectFit: 'cover', borderRadius: '50%' }}
+                      style={{ objectFit: 'cover', objectPosition: form.image_position, borderRadius: '50%' }}
                       sizes="80px"
                     />
                   ) : (
@@ -394,6 +398,23 @@ export default function MembersAdmin() {
                     <Camera size={16} /> {uploading ? 'Uploading...' : 'Upload Photo'}
                   </button>
                   <p className={styles.uploadHint}>JPG or PNG. Max size 2MB.</p>
+                  
+                  {photoUrl && (
+                    <div className={styles.formField} style={{ marginTop: '8px' }}>
+                      <label style={{ fontSize: '0.65rem' }}>Photo Focus</label>
+                      <select
+                        value={form.image_position}
+                        onChange={(e) => setForm({ ...form, image_position: e.target.value })}
+                        style={{ padding: '6px', fontSize: '0.75rem' }}
+                      >
+                        <option value="center top">Atas (Wajah)</option>
+                        <option value="center center">Tengah</option>
+                        <option value="center bottom">Bawah</option>
+                        <option value="left center">Kiri</option>
+                        <option value="right center">Kanan</option>
+                      </select>
+                    </div>
+                  )}
                 </div>
               </div>
 

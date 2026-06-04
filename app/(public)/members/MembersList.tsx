@@ -120,6 +120,7 @@ export default function MembersList({ initialMembers }: MembersListProps) {
                         fill
                         className={styles.avatarImg}
                         sizes="(max-width: 640px) 80px, 96px"
+                        style={{ objectPosition: member.image_position || 'center center' }}
                       />
                     ) : (
                       <div className={styles.avatarFallback}>

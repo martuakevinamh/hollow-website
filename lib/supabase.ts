@@ -25,6 +25,7 @@ export type Member = {
   server: 'samp' | 'fivem' | 'both';
   bio: string | null;
   photo_url: string | null;
+  image_position?: string;
   joined_at: string;
   is_active: boolean;
 };
@@ -91,7 +92,7 @@ export async function getSettings(): Promise<SiteSettings> {
     const settings = { ...DEFAULT_SETTINGS };
     data.forEach((item: { key: string; value: string }) => {
       if (item.key in settings) {
-        (settings as any)[item.key] = item.value;
+        (settings as Record<string, string>)[item.key] = item.value;
       }
     });
     return settings;
