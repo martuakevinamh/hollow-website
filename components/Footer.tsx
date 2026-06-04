@@ -77,9 +77,7 @@ export default function Footer({ settings }: { settings?: SiteSettings }) {
               </p>
             </div>
             <a
-              href={currentSettings.discord_samp}
-              target="_blank"
-              rel="noopener noreferrer"
+              href="#footer-socials"
               className="btn btn-primary"
             >
               Join Discord →
@@ -113,7 +111,7 @@ export default function Footer({ settings }: { settings?: SiteSettings }) {
           </p>
 
           {/* SAMP Socials */}
-          <div className={styles.socialGroup}>
+          <div className={styles.socialGroup} id="footer-socials">
             <div className={styles.socialGroupTitle}>
               <span>🏴󠁧󠁢󠁥󠁮󠁧󠁿</span> GTA SA:MP (The Hollow Block)
             </div>

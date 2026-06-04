@@ -5,6 +5,18 @@ import { AuthProvider, useAuth } from '@/components/AuthProvider';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import {
+  LayoutDashboard,
+  Users,
+  Images,
+  Newspaper,
+  Settings,
+  KeyRound,
+  LogOut,
+  Globe,
+  X,
+  Menu,
+} from 'lucide-react';
 import styles from './admin-layout.module.css';
 
 function AdminProtectedContent({ children }: { children: React.ReactNode }) {
@@ -38,12 +50,12 @@ function AdminProtectedContent({ children }: { children: React.ReactNode }) {
   }
 
   const menuItems = [
-    { href: '/admin', label: 'Dashboard', icon: '📊' },
-    { href: '/admin/members', label: 'Members', icon: '👤' },
-    { href: '/admin/gallery', label: 'Gallery', icon: '🖼️' },
-    { href: '/admin/news', label: 'News', icon: '📰' },
-    { href: '/admin/settings', label: 'Settings', icon: '⚙️' },
-    ...(role === 'utama' ? [{ href: '/admin/users', label: 'Admins', icon: '🔑' }] : []),
+    { href: '/admin',          label: 'Dashboard', Icon: LayoutDashboard },
+    { href: '/admin/members',  label: 'Members',   Icon: Users },
+    { href: '/admin/gallery',  label: 'Gallery',   Icon: Images },
+    { href: '/admin/news',     label: 'News',      Icon: Newspaper },
+    { href: '/admin/settings', label: 'Settings',  Icon: Settings },
+    ...(role === 'utama' ? [{ href: '/admin/users', label: 'Admins', Icon: KeyRound }] : []),
   ];
 
   return (
@@ -55,9 +67,7 @@ function AdminProtectedContent({ children }: { children: React.ReactNode }) {
           onClick={() => setSidebarOpen(true)}
           aria-label="Open sidebar menu"
         >
-          <span></span>
-          <span></span>
-          <span></span>
+          <Menu size={20} />
         </button>
         <div className={styles.mobileNavbarLogo}>
           <Image
@@ -69,8 +79,8 @@ function AdminProtectedContent({ children }: { children: React.ReactNode }) {
           />
           <span>HOLLOW PANEL</span>
         </div>
-        <Link href="/" target="_blank" className="btn btn-outline" style={{ padding: '6px 10px', fontSize: '0.65rem', minHeight: 'auto' }}>
-          🌐 Site
+        <Link href="/" target="_blank" className="btn btn-outline" style={{ padding: '6px 10px', fontSize: '0.65rem', minHeight: 'auto', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <Globe size={13} /> Site
         </Link>
       </header>
 
@@ -105,7 +115,7 @@ function AdminProtectedContent({ children }: { children: React.ReactNode }) {
             onClick={() => setSidebarOpen(false)}
             aria-label="Close sidebar menu"
           >
-            ✕
+            <X size={18} />
           </button>
         </div>
 
@@ -121,7 +131,7 @@ function AdminProtectedContent({ children }: { children: React.ReactNode }) {
                   : ''
               }`}
             >
-              <span className={styles.navIcon}>{item.icon}</span>
+              <item.Icon size={18} className={styles.navIcon} strokeWidth={1.75} />
               <span className={styles.navLabel}>{item.label}</span>
             </Link>
           ))}
@@ -132,7 +142,7 @@ function AdminProtectedContent({ children }: { children: React.ReactNode }) {
             <span className={styles.userEmail}>{user.email}</span>
           </div>
           <button onClick={logout} className={styles.logoutBtn}>
-            <span>🚪</span> Sign Out
+            <LogOut size={15} strokeWidth={1.75} /> Sign Out
           </button>
         </div>
       </aside>
@@ -144,8 +154,8 @@ function AdminProtectedContent({ children }: { children: React.ReactNode }) {
             {menuItems.find((item) => pathname === item.href || (item.href !== '/admin' && pathname.startsWith(item.href)))?.label || 'Admin'}
           </h2>
           <div className={styles.headerActions}>
-            <Link href="/" target="_blank" className="btn btn-outline" style={{ padding: '8px 16px', fontSize: '0.75rem' }}>
-              🌐 View Website
+            <Link href="/" target="_blank" className="btn btn-outline" style={{ padding: '8px 16px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <Globe size={14} /> View Website
             </Link>
           </div>
         </header>

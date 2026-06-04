@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import { connection } from 'next/server';
 import styles from './join.module.css';
 import { getSettings } from '@/lib/supabase';
 
@@ -45,6 +46,8 @@ const requirements = [
 ];
 
 export default async function JoinPage() {
+  // Opt out of static prerendering — always fetch fresh settings from DB
+  await connection();
   const settings = await getSettings();
 
   return (
@@ -64,15 +67,28 @@ export default async function JoinPage() {
           <p className={styles.joinSubtitle}>
             Satu langkah menuju persaudaraan yang tak tergoyahkan
           </p>
-          <a
-            href={settings.discord_samp}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`btn btn-primary ${styles.discordBtn}`}
-            id="join-discord-main"
-          >
-            🎮 Join Discord Sekarang
-          </a>
+          <div className={styles.discordBtns}>
+            <a
+              href={settings.discord_samp}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={`btn btn-primary ${styles.discordBtn}`}
+              id="join-discord-samp"
+            >
+              🎮 SAMP Discord
+            </a>
+            {settings.discord_fivem && (
+              <a
+                href={settings.discord_fivem}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`btn btn-outline ${styles.discordBtn}`}
+                id="join-discord-fivem"
+              >
+                🚗 FiveM Discord
+              </a>
+            )}
+          </div>
         </div>
       </section>
 
@@ -132,16 +148,30 @@ export default async function JoinPage() {
                   </div>
                   <div className={styles.onlineDot} />
                 </div>
-                <a
-                  href={settings.discord_samp}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="btn btn-primary"
-                  style={{ width: '100%', justifyContent: 'center', marginTop: '8px' }}
-                  id="join-discord-card"
-                >
-                  Gabung Discord →
-                </a>
+                <div className={styles.discordBtns} style={{ marginTop: '8px' }}>
+                  <a
+                    href={settings.discord_samp}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="btn btn-primary"
+                    style={{ flex: 1, justifyContent: 'center' }}
+                    id="join-discord-card-samp"
+                  >
+                    🎮 SAMP
+                  </a>
+                  {settings.discord_fivem && (
+                    <a
+                      href={settings.discord_fivem}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="btn btn-outline"
+                      style={{ flex: 1, justifyContent: 'center' }}
+                      id="join-discord-card-fivem"
+                    >
+                      🚗 FiveM
+                    </a>
+                  )}
+                </div>
                 <p className={styles.reqNote}>
                   Proses verifikasi biasanya memakan waktu 1-3 hari kerja setelah kamu memperkenalkan diri di Discord.
                 </p>

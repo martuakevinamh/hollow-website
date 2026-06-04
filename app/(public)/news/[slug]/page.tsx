@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
+import { connection } from 'next/server';
 import { supabase, type NewsItem } from '@/lib/supabase';
 import styles from './detail.module.css';
 
@@ -11,6 +12,9 @@ type PageProps = {
 };
 
 async function getArticle(slug: string): Promise<NewsItem | null> {
+  // Opt out of static prerendering — always fetch fresh data from DB
+  await connection();
+
   try {
     const { data, error } = await supabase
       .from('news')

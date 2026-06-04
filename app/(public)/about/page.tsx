@@ -1,6 +1,7 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { connection } from 'next/server';
 import AboutTabs from '@/components/AboutTabs';
 import styles from './about.module.css';
 import { getSettings } from '@/lib/supabase';
@@ -28,6 +29,8 @@ const values = [
 ];
 
 export default async function AboutPage() {
+  // Opt out of static prerendering — always fetch fresh settings from DB
+  await connection();
   const settings = await getSettings();
 
   return (

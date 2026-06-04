@@ -20,6 +20,7 @@ export default function MembersAdmin() {
   // Search / Filters
   const [search, setSearch] = useState('');
   const [rankFilter, setRankFilter] = useState('');
+  const [serverFilter, setServerFilter] = useState('');
 
   // Form State
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -59,8 +60,8 @@ export default function MembersAdmin() {
       } else {
         setMembers(data || []);
       }
-    } catch (err: any) {
-      setError(err.message || 'An error occurred fetching members');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred fetching members');
     } finally {
       setLoading(false);
     }
@@ -126,8 +127,8 @@ export default function MembersAdmin() {
         .getPublicUrl(filePath);
 
       setPhotoUrl(data.publicUrl);
-    } catch (err: any) {
-      setError(err.message || 'Failed to upload photo');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to upload photo');
     } finally {
       setUploading(false);
     }
@@ -166,8 +167,8 @@ export default function MembersAdmin() {
 
       setIsFormOpen(false);
       fetchMembers();
-    } catch (err: any) {
-      setError(err.message || 'Failed to save member');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to save member');
     }
   };
 
@@ -181,8 +182,8 @@ export default function MembersAdmin() {
 
       if (error) throw error;
       fetchMembers();
-    } catch (err: any) {
-      setError(err.message || 'Failed to update member status');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to update member status');
     }
   };
 
@@ -200,16 +201,17 @@ export default function MembersAdmin() {
 
       if (error) throw error;
       fetchMembers();
-    } catch (err: any) {
-      setError(err.message || 'Failed to delete member');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to delete member');
     }
   };
 
   // Filter members
   const filteredMembers = members.filter((member) => {
     const matchesSearch = member.name_rp.toLowerCase().includes(search.toLowerCase());
-    const matchesRank = rankFilter ? member.rank === rankFilter : true;
-    return matchesSearch && matchesRank;
+    const matchesRank   = rankFilter   ? member.rank   === rankFilter   : true;
+    const matchesServer = serverFilter ? member.server === serverFilter : true;
+    return matchesSearch && matchesRank && matchesServer;
   });
 
   return (
@@ -237,6 +239,16 @@ export default function MembersAdmin() {
                 {r}
               </option>
             ))}
+          </select>
+          <select
+            value={serverFilter}
+            onChange={(e) => setServerFilter(e.target.value)}
+            className={styles.selectInput}
+          >
+            <option value="">All Servers</option>
+            <option value="samp">🎮 GTA SAMP</option>
+            <option value="fivem">🚗 GTA FiveM</option>
+            <option value="both">🌐 Both</option>
           </select>
         </div>
 

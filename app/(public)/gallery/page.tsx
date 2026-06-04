@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { connection } from 'next/server';
 import { supabase, type GalleryItem } from '@/lib/supabase';
 import { GalleryGrid } from './GalleryClient';
 import styles from './gallery.module.css';
@@ -9,6 +10,9 @@ export const metadata: Metadata = {
 };
 
 async function getGallery(): Promise<GalleryItem[]> {
+  // Opt out of static prerendering — always fetch fresh data from DB
+  await connection();
+
   try {
     const { data, error } = await supabase
       .from('gallery')

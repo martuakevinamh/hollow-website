@@ -1,6 +1,8 @@
 import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
+import { connection } from 'next/server';
+import { supabase } from '@/lib/supabase';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
@@ -8,12 +10,6 @@ export const metadata: Metadata = {
   description: 'Komunitas gangster UK terkemuka di GTA SAMP dan GTA FiveM Roleplay. Bergabunglah dan rasakan pengalaman roleplay kelas dunia.',
 };
 
-const stats = [
-  { value: '200+', label: 'Active Members' },
-  { value: '5+', label: 'Tahun Berdiri' },
-  { value: '2', label: 'Platform Aktif' },
-  { value: '24/7', label: 'Server Online' },
-];
 
 const servers = [
   {
@@ -65,7 +61,27 @@ const features = [
   },
 ];
 
-export default function Home() {
+export default async function Home() {
+  // Opt out of static prerendering — fetch live member count
+  await connection();
+
+  let memberCount = 0;
+  try {
+    const { count } = await supabase
+      .from('members')
+      .select('*', { count: 'exact', head: true })
+      .eq('is_active', true);
+    memberCount = count ?? 0;
+  } catch {
+    memberCount = 0;
+  }
+
+  const stats = [
+    { value: memberCount > 0 ? `${memberCount}` : '—', label: 'Active Members' },
+    { value: '5+', label: 'Tahun Berdiri' },
+    { value: '2',  label: 'Platform Aktif' },
+    { value: '24/7', label: 'Server Online' },
+  ];
   return (
     <>
       {/* HERO */}
@@ -243,9 +259,9 @@ export default function Home() {
             komunitas gangster UK terbaik di dunia roleplay.
           </p>
           <div className={styles.finalCtaBtns}>
-            <Link href="/join" className="btn btn-primary" id="final-cta-join">
-              Join Hollow →
-            </Link>
+            <a href="/#footer-socials" className="btn btn-primary" id="final-cta-join">
+              Join Discord →
+            </a>
             <Link href="/gallery" className="btn btn-outline" id="final-cta-gallery">
               Lihat Gallery
             </Link>

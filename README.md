@@ -80,3 +80,11 @@ npm run build
 # Jalankan aplikasi hasil build
 npm start
 ```
+
+---
+
+## 👨‍💻 Developer
+
+| Nama | Role |
+|------|------|
+| **Michio (Martua Kevin)** | Full-Stack Developer — Website & Admin Panel |

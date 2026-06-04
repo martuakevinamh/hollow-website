@@ -3,6 +3,15 @@
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import Link from 'next/link';
+import {
+  Users,
+  Images,
+  Newspaper,
+  UserPlus,
+  ImagePlus,
+  FilePlus,
+  AlertTriangle,
+} from 'lucide-react';
 import styles from './dashboard.module.css';
 
 export default function AdminDashboard() {
@@ -20,7 +29,7 @@ export default function AdminDashboard() {
         const [
           { count: membersCount, error: membersErr },
           { count: newsCount, error: newsErr },
-          { count: galleryCount, error: galleryErr }
+          { count: galleryCount }
         ] = await Promise.all([
           supabase.from('members').select('*', { count: 'exact', head: true }),
           supabase.from('news').select('*', { count: 'exact', head: true }),
@@ -61,7 +70,7 @@ export default function AdminDashboard() {
     <div className={styles.dashboard}>
       {!dbConfigured && (
         <div className={styles.warningBanner}>
-          <h3>⚠️ Database Not Configured</h3>
+          <h3><AlertTriangle size={16} style={{ display: 'inline', verticalAlign: 'middle', marginRight: 6 }} /> Database Not Configured</h3>
           <p>
             Your Supabase credentials are missing or default in <code>.env.local</code>. 
             Please configure them to view real stats and manage data. Database operations will fail.
@@ -72,21 +81,21 @@ export default function AdminDashboard() {
       {/* Stats Cards */}
       <div className={styles.statsGrid}>
         <div className={styles.statCard}>
-          <div className={styles.statIcon}>👤</div>
+          <div className={styles.statIcon}><Users size={24} strokeWidth={1.5} /></div>
           <div>
             <div className={styles.statVal}>{stats.members}</div>
             <div className={styles.statLabel}>Roster Members</div>
           </div>
         </div>
         <div className={styles.statCard}>
-          <div className={styles.statIcon}>🖼️</div>
+          <div className={styles.statIcon}><Images size={24} strokeWidth={1.5} /></div>
           <div>
             <div className={styles.statVal}>{stats.gallery}</div>
             <div className={styles.statLabel}>Gallery Images</div>
           </div>
         </div>
         <div className={styles.statCard}>
-          <div className={styles.statIcon}>📰</div>
+          <div className={styles.statIcon}><Newspaper size={24} strokeWidth={1.5} /></div>
           <div>
             <div className={styles.statVal}>{stats.news}</div>
             <div className={styles.statLabel}>News Articles</div>
@@ -99,15 +108,15 @@ export default function AdminDashboard() {
         <h3 className={styles.sectionTitle}>Quick Actions</h3>
         <div className={styles.actionsGrid}>
           <Link href="/admin/members?add=true" className={styles.actionBtn}>
-            <span className={styles.actionIcon}>➕👤</span>
+            <span className={styles.actionIcon}><UserPlus size={28} strokeWidth={1.5} /></span>
             <span>Add Member</span>
           </Link>
           <Link href="/admin/gallery?add=true" className={styles.actionBtn}>
-            <span className={styles.actionIcon}>➕🖼️</span>
+            <span className={styles.actionIcon}><ImagePlus size={28} strokeWidth={1.5} /></span>
             <span>Upload Photo</span>
           </Link>
           <Link href="/admin/news?add=true" className={styles.actionBtn}>
-            <span className={styles.actionIcon}>➕📰</span>
+            <span className={styles.actionIcon}><FilePlus size={28} strokeWidth={1.5} /></span>
             <span>Publish Article</span>
           </Link>
         </div>

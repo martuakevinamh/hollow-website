@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { connection } from 'next/server';
 import { supabase, type Member } from '@/lib/supabase';
 import styles from './members.module.css';
 import MembersList from './MembersList';
@@ -9,6 +10,9 @@ export const metadata: Metadata = {
 };
 
 async function getMembers(): Promise<Member[]> {
+  // Opt out of static prerendering — always fetch fresh data from DB
+  await connection();
+
   try {
     const { data, error } = await supabase
       .from('members')
