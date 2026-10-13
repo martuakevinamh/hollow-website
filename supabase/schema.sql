@@ -68,18 +68,68 @@ ALTER TABLE public.gallery DISABLE ROW LEVEL SECURITY;
 
 
 -- ============================================
--- STORAGE BUCKET: gallery-images
--- Buat di Supabase Dashboard > Storage
--- Atau jalankan jika pakai Supabase CLI:
+-- STORAGE BUCKETS & RLS POLICIES
+-- Jalankan ini di Supabase SQL Editor untuk
+-- mengizinkan upload logo kota, foto member & galeri
 -- ============================================
--- INSERT INTO storage.buckets (id, name, public)
--- VALUES ('gallery-images', 'gallery-images', TRUE);
+INSERT INTO storage.buckets (id, name, public)
+VALUES 
+  ('city-logos', 'city-logos', TRUE),
+  ('member-photos', 'member-photos', TRUE),
+  ('gallery-images', 'gallery-images', TRUE)
+ON CONFLICT (id) DO UPDATE SET public = TRUE;
 
--- INSERT INTO storage.buckets (id, name, public)
--- VALUES ('member-photos', 'member-photos', TRUE);
+-- Policy INSERT (Upload file)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'objects' AND policyname = 'Allow public insert hollow storage'
+  ) THEN
+    CREATE POLICY "Allow public insert hollow storage"
+    ON storage.objects FOR INSERT
+    TO public
+    WITH CHECK (bucket_id IN ('city-logos', 'member-photos', 'gallery-images'));
+  END IF;
+END $$;
 
--- INSERT INTO storage.buckets (id, name, public)
--- VALUES ('city-logos', 'city-logos', TRUE);
+-- Policy SELECT (Akses / lihat file publik)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'objects' AND policyname = 'Allow public select hollow storage'
+  ) THEN
+    CREATE POLICY "Allow public select hollow storage"
+    ON storage.objects FOR SELECT
+    TO public
+    USING (bucket_id IN ('city-logos', 'member-photos', 'gallery-images'));
+  END IF;
+END $$;
+
+-- Policy UPDATE (Ganti / overwrite file)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'objects' AND policyname = 'Allow public update hollow storage'
+  ) THEN
+    CREATE POLICY "Allow public update hollow storage"
+    ON storage.objects FOR UPDATE
+    TO public
+    USING (bucket_id IN ('city-logos', 'member-photos', 'gallery-images'));
+  END IF;
+END $$;
+
+-- Policy DELETE (Hapus file)
+DO $$
+BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_policies WHERE tablename = 'objects' AND policyname = 'Allow public delete hollow storage'
+  ) THEN
+    CREATE POLICY "Allow public delete hollow storage"
+    ON storage.objects FOR DELETE
+    TO public
+    USING (bucket_id IN ('city-logos', 'member-photos', 'gallery-images'));
+  END IF;
+END $$;
 
 
 -- ============================================

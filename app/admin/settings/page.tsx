@@ -267,7 +267,12 @@ export default function SettingsAdmin() {
       setSuccess(`Logo untuk "${city.name}" berhasil diupload!`);
       setTimeout(() => setSuccess(''), 3000);
     } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Gagal upload logo kota');
+      const msg = err instanceof Error ? err.message : 'Gagal upload logo kota';
+      if (msg.toLowerCase().includes('row-level security') || msg.toLowerCase().includes('violates')) {
+        setError('Storage RLS Policy: Bucket "city-logos" belum memiliki policy INSERT di Supabase. Jalankan query SQL Storage Policy di Supabase SQL Editor.');
+      } else {
+        setError(msg);
+      }
     } finally {
       setUploadingCityId(null);
       e.target.value = '';
