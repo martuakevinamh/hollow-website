@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { supabase, type Member } from '@/lib/supabase';
+import { supabase, type Member, type ServerCity, DEFAULT_SERVER_CITIES } from '@/lib/supabase';
 import Image from 'next/image';
 import { UserPlus, Edit2, Trash2, User, Camera } from 'lucide-react';
 import styles from './members-admin.module.css';
@@ -15,8 +15,16 @@ const SERVERS = [
 
 export default function MembersAdmin() {
   const [members, setMembers] = useState<Member[]>([]);
+  const [availableCities, setAvailableCities] = useState<ServerCity[]>(DEFAULT_SERVER_CITIES);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+
+  function getCities(server: 'samp' | 'fivem' | 'both'): string[] {
+    const filtered = server === 'both'
+      ? availableCities
+      : availableCities.filter((c) => c.server === server);
+    return filtered.map((c) => c.name);
+  }
   
   // Search / Filters
   const [search, setSearch] = useState('');
@@ -30,6 +38,7 @@ export default function MembersAdmin() {
     name_rp: '',
     rank: 'Muscle',
     server: 'samp' as 'samp' | 'fivem' | 'both',
+    server_city: 'MandalikaRP',
     bio: '',
     image_position: 'center center',
     joined_at: new Date().toISOString().split('T')[0],
@@ -62,6 +71,16 @@ export default function MembersAdmin() {
       } else {
         setMembers(data || []);
       }
+
+      // Fetch dynamic cities
+      const { data: cityData } = await supabase
+        .from('server_cities')
+        .select('*')
+        .eq('is_active', true)
+        .order('sort_order', { ascending: true });
+      if (cityData && cityData.length > 0) {
+        setAvailableCities(cityData);
+      }
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'An error occurred fetching members');
     } finally {
@@ -76,6 +95,7 @@ export default function MembersAdmin() {
       name_rp: '',
       rank: 'Muscle',
       server: 'samp',
+      server_city: 'MandalikaRP',
       bio: '',
       image_position: 'center center',
       joined_at: new Date().toISOString().split('T')[0],
@@ -92,6 +112,7 @@ export default function MembersAdmin() {
       name_rp: member.name_rp,
       rank: member.rank,
       server: member.server,
+      server_city: member.server_city || '',
       bio: member.bio || '',
       image_position: member.image_position || 'center center',
       joined_at: new Date(member.joined_at).toISOString().split('T')[0],
@@ -147,6 +168,7 @@ export default function MembersAdmin() {
       name_rp: form.name_rp,
       rank: form.rank,
       server: form.server,
+      server_city: form.server_city || null,
       bio: form.bio || null,
       photo_url: photoUrl,
       image_position: form.image_position,
@@ -277,6 +299,7 @@ export default function MembersAdmin() {
                 <th>RP Name</th>
                 <th>Rank</th>
                 <th>Server</th>
+                <th>Server Kota</th>
                 <th>Joined</th>
                 <th>Status</th>
                 <th>Actions</th>
@@ -285,7 +308,7 @@ export default function MembersAdmin() {
             <tbody>
               {filteredMembers.length === 0 ? (
                 <tr>
-                  <td colSpan={7} className={styles.noData}>
+                  <td colSpan={8} className={styles.noData}>
                     No members found. Add some members to build your gang roster.
                   </td>
                 </tr>
@@ -315,6 +338,9 @@ export default function MembersAdmin() {
                     </td>
                     <td>
                       <span className={styles.serverBadge}>{member.server}</span>
+                    </td>
+                    <td className={styles.dateCell}>
+                      {member.server_city || <span style={{ opacity: 0.4 }}>—</span>}
                     </td>
                     <td className={styles.dateCell}>
                       {new Date(member.joined_at).toLocaleDateString('id-ID', {
@@ -448,13 +474,30 @@ export default function MembersAdmin() {
                   <label>Server</label>
                   <select
                     value={form.server}
-                    onChange={(e) =>
-                      setForm({ ...form, server: e.target.value as 'samp' | 'fivem' | 'both' })
-                    }
+                    onChange={(e) => {
+                      const newServer = e.target.value as 'samp' | 'fivem' | 'both';
+                      const cities = getCities(newServer);
+                      setForm({ ...form, server: newServer, server_city: cities[0] });
+                    }}
                   >
                     {SERVERS.map((s) => (
                       <option key={s.value} value={s.value}>
                         {s.label}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <div className={styles.formField}>
+                  <label>Server Kota</label>
+                  <select
+                    value={form.server_city}
+                    onChange={(e) => setForm({ ...form, server_city: e.target.value })}
+                  >
+                    <option value="">— Tidak diketahui —</option>
+                    {getCities(form.server).map((city) => (
+                      <option key={city} value={city}>
+                        {city}
                       </option>
                     ))}
                   </select>

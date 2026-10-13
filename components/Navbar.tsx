@@ -32,9 +32,11 @@ export default function Navbar({ settings }: { settings?: SiteSettings }) {
     document.body.classList.toggle('menu-open', menuOpen);
   }, [menuOpen]);
 
-  useEffect(() => {
+  const [prevPathname, setPrevPathname] = useState(pathname);
+  if (prevPathname !== pathname) {
+    setPrevPathname(pathname);
     setMenuOpen(false);
-  }, [pathname]);
+  }
 
   return (
     <nav className={`${styles.navbar} ${scrolled ? styles.scrolled : ''}`}>

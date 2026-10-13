@@ -25,12 +25,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
   const [role, setRole] = useState<'utama' | 'sekunder' | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(Boolean(auth));
   const router = useRouter();
 
   useEffect(() => {
     if (!auth) {
-      setLoading(false);
       return;
     }
     const unsubscribe = onAuthStateChanged(auth, async (currentUser) => {

@@ -7,16 +7,20 @@
 -- TABEL: members
 -- ============================================
 CREATE TABLE IF NOT EXISTS public.members (
-  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-  name_rp     TEXT NOT NULL,
-  rank        TEXT NOT NULL CHECK (rank IN ('TOP OG/KING','OG','Top Boy','Brudda','Rude Boy','The Youth','Muscle')),
-  server      TEXT NOT NULL CHECK (server IN ('samp','fivem','both')) DEFAULT 'samp',
-  bio         TEXT,
-  photo_url   TEXT,
-  joined_at   TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  is_active   BOOLEAN NOT NULL DEFAULT TRUE,
-  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+  id            UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name_rp       TEXT NOT NULL,
+  rank          TEXT NOT NULL CHECK (rank IN ('TOP OG/KING','OG','Top Boy','Brudda','Rude Boy','The Youth','Muscle')),
+  server        TEXT NOT NULL CHECK (server IN ('samp','fivem','both')) DEFAULT 'samp',
+  server_city   TEXT,
+  bio           TEXT,
+  photo_url     TEXT,
+  joined_at     TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  is_active     BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at    TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
+
+-- Migration: tambahkan kolom server_city jika belum ada (untuk database yang sudah exist)
+ALTER TABLE public.members ADD COLUMN IF NOT EXISTS server_city TEXT;
 
 -- Index untuk sorting
 CREATE INDEX IF NOT EXISTS idx_members_rank ON public.members(rank);
@@ -74,18 +78,21 @@ ALTER TABLE public.gallery DISABLE ROW LEVEL SECURITY;
 -- INSERT INTO storage.buckets (id, name, public)
 -- VALUES ('member-photos', 'member-photos', TRUE);
 
+-- INSERT INTO storage.buckets (id, name, public)
+-- VALUES ('city-logos', 'city-logos', TRUE);
+
 
 -- ============================================
 -- SAMPLE DATA (opsional, untuk testing)
 -- ============================================
-INSERT INTO public.members (name_rp, rank, server, bio, is_active) VALUES
-  ('Shadow King',  'TOP OG/KING', 'both',  'Pendiri The Hollow Block. Legend yang dihormati di seluruh block.', TRUE),
-  ('Ghost Reaper', 'OG',          'fivem', 'Senior berpengaruh, mantan Top Boy yang jadi panutan semua anggota.', TRUE),
-  ('Iron Mike',    'Top Boy',     'samp',  'Ngatur operasi blok timur. Keputusannya tidak pernah dipertanyakan.', TRUE),
-  ('Blaze UK',     'Brudda',      'both',  'Anggota resmi yang sudah dianggap keluarga oleh seluruh block.', TRUE),
-  ('Young Flex',   'Rude Boy',    'fivem', 'Pemuda keras jalanan yang mulai dihormati di lingkungannya.', TRUE),
-  ('Lil Shan',     'The Youth',   'samp',  'Baru mulai belajar kode jalanan dan cara hidup di block.', TRUE),
-  ('Rookie D',     'Muscle',      'both',  'Sering nongkrong bareng geng, belum resmi tapi sudah terbukti.', TRUE)
+INSERT INTO public.members (name_rp, rank, server, server_city, bio, is_active) VALUES
+  ('Shadow King',  'TOP OG/KING', 'both',  'MandalikaRP',   'Pendiri The Hollow Block. Legend yang dihormati di seluruh block.', TRUE),
+  ('Ghost Reaper', 'OG',          'fivem', 'Nexa Roleplay', 'Senior berpengaruh, mantan Top Boy yang jadi panutan semua anggota.', TRUE),
+  ('Iron Mike',    'Top Boy',     'samp',  'UnionRP',        'Ngatur operasi blok timur. Keputusannya tidak pernah dipertanyakan.', TRUE),
+  ('Blaze UK',     'Brudda',      'both',  'MandalikaRP',   'Anggota resmi yang sudah dianggap keluarga oleh seluruh block.', TRUE),
+  ('Young Flex',   'Rude Boy',    'fivem', 'Nexa Roleplay', 'Pemuda keras jalanan yang mulai dihormati di lingkungannya.', TRUE),
+  ('Lil Shan',     'The Youth',   'samp',  'UnionRP',        'Baru mulai belajar kode jalanan dan cara hidup di block.', TRUE),
+  ('Rookie D',     'Muscle',      'both',  'MandalikaRP',   'Sering nongkrong bareng geng, belum resmi tapi sudah terbukti.', TRUE)
 ON CONFLICT DO NOTHING;
 
 INSERT INTO public.news (title, slug, content, server, author, is_published) VALUES
@@ -153,5 +160,31 @@ INSERT INTO public.settings (key, value) VALUES
   ('discord_fivem', 'https://discord.gg/x5NCxdC52'),
   ('tiktok_fivem', ''),
   ('youtube_fivem', ''),
-  ('instagram_fivem', '')
+  ('instagram_fivem', ''),
+  ('city_logo_mandalikarp', ''),
+  ('city_logo_unionrp', ''),
+  ('city_logo_nexaroleplay', '')
 ON CONFLICT (key) DO UPDATE SET value = EXCLUDED.value;
+
+-- ============================================
+-- TABEL: server_cities (Dinamis Server Kota)
+-- ============================================
+CREATE TABLE IF NOT EXISTS public.server_cities (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  name        TEXT NOT NULL UNIQUE,
+  server      TEXT NOT NULL CHECK (server IN ('samp', 'fivem')),
+  color       TEXT NOT NULL DEFAULT '#e2a02b',
+  logo_url    TEXT,
+  sort_order  INT NOT NULL DEFAULT 0,
+  is_active   BOOLEAN NOT NULL DEFAULT TRUE,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE public.server_cities DISABLE ROW LEVEL SECURITY;
+
+-- SEED DATA: server_cities
+INSERT INTO public.server_cities (name, server, color, logo_url, sort_order) VALUES
+  ('MandalikaRP',   'samp',  '#e2a02b', NULL, 1),
+  ('UnionRP',       'samp',  '#6b7fe0', NULL, 2),
+  ('Nexa Roleplay', 'fivem', '#2bc5c0', NULL, 3)
+ON CONFLICT (name) DO NOTHING;

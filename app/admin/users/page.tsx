@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useCallback } from 'react';
 import { useAuth } from '@/components/AuthProvider';
 import styles from './users-admin.module.css';
 
@@ -29,13 +29,7 @@ export default function UsersAdmin() {
   const [roleField, setRoleField] = useState<'utama' | 'sekunder'>('sekunder');
   const [saving, setSaving] = useState(false);
 
-  useEffect(() => {
-    if (token && currentRole === 'utama') {
-      fetchUsers();
-    }
-  }, [token, currentRole]);
-
-  async function fetchUsers() {
+  const fetchUsers = useCallback(async () => {
     setLoading(true);
     setError('');
     try {
@@ -51,12 +45,42 @@ export default function UsersAdmin() {
       }
 
       setUsers(data.users || []);
-    } catch (err: any) {
-      setError(err.message || 'An error occurred fetching admin list');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'An error occurred fetching admin list');
     } finally {
       setLoading(false);
     }
-  }
+  }, [token]);
+
+  useEffect(() => {
+    if (!token || currentRole !== 'utama') return;
+    let isMounted = true;
+
+    fetch('/api/admin/users', {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
+      .then(async (res) => {
+        const data = await res.json();
+        if (!isMounted) return;
+        if (!res.ok) {
+          setError(data.error || 'Failed to fetch admin users');
+        } else {
+          setUsers(data.users || []);
+        }
+        setLoading(false);
+      })
+      .catch((err: unknown) => {
+        if (!isMounted) return;
+        setError(err instanceof Error ? err.message : 'An error occurred fetching admin list');
+        setLoading(false);
+      });
+
+    return () => {
+      isMounted = false;
+    };
+  }, [token, currentRole]);
 
   const handleAddOpen = () => {
     setEmail('');
@@ -91,8 +115,8 @@ export default function UsersAdmin() {
       setSuccess(`Admin account ${email} successfully created as Admin ${roleField === 'utama' ? 'Utama' : 'Sekunder'}!`);
       setIsFormOpen(false);
       fetchUsers();
-    } catch (err: any) {
-      setError(err.message || 'Failed to save admin user');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to save admin user');
     } finally {
       setSaving(false);
     }
@@ -126,8 +150,8 @@ export default function UsersAdmin() {
 
       setSuccess(`Admin account ${emailStr} successfully deleted!`);
       fetchUsers();
-    } catch (err: any) {
-      setError(err.message || 'Failed to delete admin account');
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Failed to delete admin account');
     }
   };
 

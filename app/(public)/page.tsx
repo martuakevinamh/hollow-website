@@ -2,7 +2,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { connection } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { supabase, getSettings, getServerCities, type Member } from '@/lib/supabase';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
@@ -10,21 +10,60 @@ export const metadata: Metadata = {
   description: 'Komunitas gangster UK terkemuka di GTA SAMP dan GTA FiveM Roleplay. Bergabunglah dan rasakan pengalaman roleplay kelas dunia.',
 };
 
+const RANK_COLORS: Record<string, string> = {
+  'TOP OG/KING': '#FFD700',
+  'OG':          '#C0C0C0',
+  'Top Boy':     '#B22234',
+  'Brudda':      '#7ba7f7',
+  'Rude Boy':    '#f7a07b',
+  'The Youth':   '#86efac',
+  'Muscle':      '#a0aec0',
+};
 
-const servers = [
+const FALLBACK_SPOTLIGHT: Member[] = [
   {
-    name: 'GTA SA:MP',
-    badge: 'SAMP',
-    badgeClass: 'badge-samp',
-    desc: 'Server roleplay SAMP kami menawarkan pengalaman UK gangster yang imersif dengan script custom dan event reguler.',
-    features: ['Custom UK Gang Script', 'Event Mingguan', 'Economy System', 'Voice RP Support'],
+    id: '1',
+    name_rp: 'Shadow King',
+    rank: 'TOP OG/KING',
+    server: 'both',
+    server_city: 'MandalikaRP',
+    bio: 'Pendiri The Hollow Block.',
+    photo_url: null,
+    joined_at: '2024-01-01',
+    is_active: true,
   },
   {
-    name: 'GTA FiveM',
-    badge: 'FIVEM',
-    badgeClass: 'badge-fivem',
-    desc: 'Di FiveM, Hollow menghadirkan roleplay high-quality dengan grafis realistis dan mekanik gangster modern.',
-    features: ['High-Quality Graphics', 'Advanced RP Mechanics', 'Custom Maps & MLOs', 'Active Community'],
+    id: '2',
+    name_rp: 'Ghost Reaper',
+    rank: 'OG',
+    server: 'fivem',
+    server_city: 'Nexa Roleplay',
+    bio: 'Senior berpengaruh di FiveM.',
+    photo_url: null,
+    joined_at: '2024-02-01',
+    is_active: true,
+  },
+  {
+    id: '3',
+    name_rp: 'Iron Mike',
+    rank: 'Top Boy',
+    server: 'samp',
+    server_city: 'UnionRP',
+    bio: 'Ngatur operasi blok timur.',
+    photo_url: null,
+    joined_at: '2024-03-01',
+    is_active: true,
+  },
+  {
+    id: '4',
+    name_rp: 'Blaze UK',
+    rank: 'Brudda',
+    server: 'both',
+    server_city: 'MandalikaRP',
+    bio: 'Loyalis keluarga Hollow.',
+    photo_url: null,
+    joined_at: '2024-04-01',
+    is_active: true,
   },
 ];
 
@@ -66,15 +105,59 @@ export default async function Home() {
   await connection();
 
   let memberCount = 0;
+  let spotlightMembers: Member[] = [];
+  const settings = await getSettings();
+  const cities = await getServerCities();
+  const sampCities = cities.filter((c) => c.server === 'samp');
+  const fivemCities = cities.filter((c) => c.server === 'fivem');
+
   try {
     const { count } = await supabase
       .from('members')
       .select('*', { count: 'exact', head: true })
       .eq('is_active', true);
     memberCount = count ?? 0;
+
+    const { data: mData } = await supabase
+      .from('members')
+      .select('*')
+      .eq('is_active', true)
+      .order('joined_at', { ascending: true })
+      .limit(4);
+    spotlightMembers = mData && mData.length > 0 ? mData : FALLBACK_SPOTLIGHT;
   } catch {
     memberCount = 0;
+    spotlightMembers = FALLBACK_SPOTLIGHT;
   }
+
+  const servers = [
+    {
+      name: 'GTA SA:MP',
+      badge: 'SAMP',
+      badgeClass: 'badge-samp',
+      desc: 'Server roleplay SAMP kami menawarkan pengalaman UK gangster yang imersif dengan script custom dan event reguler.',
+      features: ['Custom UK Gang Script', 'Event Mingguan', 'Economy System', 'Voice RP Support'],
+      cities: sampCities.map((c) => ({
+        name: c.name,
+        color: c.color,
+        icon: '🏙️',
+        logoUrl: c.logo_url,
+      })),
+    },
+    {
+      name: 'GTA FiveM',
+      badge: 'FIVEM',
+      badgeClass: 'badge-fivem',
+      desc: 'Di FiveM, Hollow menghadirkan roleplay high-quality dengan grafis realistis dan mekanik gangster modern.',
+      features: ['High-Quality Graphics', 'Advanced RP Mechanics', 'Custom Maps & MLOs', 'Active Community'],
+      cities: fivemCities.map((c) => ({
+        name: c.name,
+        color: c.color,
+        icon: '🌃',
+        logoUrl: c.logo_url,
+      })),
+    },
+  ];
 
   const stats = [
     { value: memberCount > 0 ? `${memberCount}` : '—', label: 'Active Members' },
@@ -165,9 +248,9 @@ export default async function Home() {
         <div className="container">
           <div className="section-header">
             <span className="section-tag">Platform Kami</span>
-            <h2 className="section-title">Aktif di <span>2 Server</span></h2>
+            <h2 className="section-title">Aktif di <span>{cities.length} Server Kota</span></h2>
             <p className="section-desc">
-              Hollow hadir di dua platform GTA roleplay terpopuler — pilih yang sesuai gaya bermainmu.
+              Hollow hadir di dua platform GTA roleplay{sampCities.length > 0 ? ` — di SAMP (${sampCities.map((c) => c.name).join(' & ')})` : ''}{fivemCities.length > 0 ? `, di FiveM (${fivemCities.map((c) => c.name).join(' & ')})` : ''}.
             </p>
           </div>
 
@@ -179,6 +262,39 @@ export default async function Home() {
                   <span className={`badge ${server.badgeClass}`}>{server.badge}</span>
                 </div>
                 <p className={styles.serverCardDesc}>{server.desc}</p>
+
+                {/* Kota Aktif */}
+                <div className={styles.serverCities}>
+                  <span className={styles.serverCitiesLabel}>📍 Aktif di</span>
+                  <div className={styles.serverCityTags}>
+                    {server.cities.map((city) => (
+                      <span
+                        key={city.name}
+                        className={styles.serverCityTag}
+                        style={{
+                          background: `${city.color}1a`,
+                          color: city.color,
+                          border: `1px solid ${city.color}44`,
+                        }}
+                      >
+                        {city.logoUrl ? (
+                          <Image
+                            src={city.logoUrl}
+                            alt={city.name}
+                            width={16}
+                            height={16}
+                            className={styles.serverCityLogo}
+                            unoptimized
+                          />
+                        ) : (
+                          <span>{city.icon}</span>
+                        )}
+                        <span>{city.name}</span>
+                      </span>
+                    ))}
+                  </div>
+                </div>
+
                 <ul className={styles.serverFeatures}>
                   {server.features.map((f) => (
                     <li key={f} className={styles.serverFeature}>
@@ -232,8 +348,66 @@ export default async function Home() {
             <h2 className="section-title">Meet <span>Hollow</span></h2>
             <p className="section-desc">Kenali para loyalis yang menjaga jalan dan menjunjung nama Hollow.</p>
           </div>
+
+          {/* Member Spotlight Grid */}
+          <div className={styles.previewGrid}>
+            {spotlightMembers.map((member) => {
+              const rankColor = RANK_COLORS[member.rank] || '#ffffff';
+              const initial = member.name_rp.charAt(0).toUpperCase();
+
+              return (
+                <div key={member.id} className={styles.previewCard}>
+                  <div
+                    className={styles.previewCardTopGlow}
+                    style={{ background: rankColor }}
+                  />
+                  <div className={styles.previewAvatarWrap}>
+                    {member.photo_url ? (
+                      <Image
+                        src={member.photo_url}
+                        alt={member.name_rp}
+                        width={72}
+                        height={72}
+                        className={styles.previewAvatarImg}
+                        unoptimized
+                      />
+                    ) : (
+                      <div className={styles.previewAvatarFallback}>
+                        {initial}
+                      </div>
+                    )}
+                  </div>
+                  <h3 className={styles.previewMemberName}>{member.name_rp}</h3>
+                  <div
+                    className={styles.previewRankBadge}
+                    style={{
+                      color: rankColor,
+                      background: `${rankColor}18`,
+                      border: `1px solid ${rankColor}40`,
+                    }}
+                  >
+                    <span
+                      className={styles.previewRankDot}
+                      style={{ background: rankColor }}
+                    />
+                    {member.rank}
+                  </div>
+                  {member.server_city && (
+                    <span className={styles.previewCityTag}>
+                      📍 {member.server_city}
+                    </span>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
           <div className={styles.previewCta}>
-            <Link href="/members" className="btn btn-navy" id="view-members-btn">
+            <Link
+              href="/members"
+              className={`btn btn-outline ${styles.previewBtn}`}
+              id="view-members-btn"
+            >
               Lihat Semua Member →
             </Link>
           </div>
@@ -259,9 +433,9 @@ export default async function Home() {
             komunitas gangster UK terbaik di dunia roleplay.
           </p>
           <div className={styles.finalCtaBtns}>
-            <a href="/#footer-socials" className="btn btn-primary" id="final-cta-join">
+            <Link href="/#footer-socials" className="btn btn-primary" id="final-cta-join">
               Join Discord →
-            </a>
+            </Link>
             <Link href="/gallery" className="btn btn-outline" id="final-cta-gallery">
               Lihat Gallery
             </Link>

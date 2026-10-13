@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
+export const dynamic = 'force-dynamic';
+
 const REQUIRED_BUCKETS = [
   { name: 'gallery-images', public: true },
   { name: 'member-photos', public: true },
+  { name: 'city-logos', public: true },
 ];
 
 export async function POST() {

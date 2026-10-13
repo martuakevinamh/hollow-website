@@ -2,7 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import { headers } from 'next/headers';
 import { adminAuth } from '@/lib/firebase-admin';
 
-export async function GET(req: NextRequest) {
+export const dynamic = 'force-dynamic';
+
+export async function GET() {
   try {
     const authHeader = (await headers()).get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -29,9 +31,10 @@ export async function GET(req: NextRequest) {
     }));
 
     return NextResponse.json({ users });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Error listing admins:', err);
-    return NextResponse.json({ error: err.message || 'Unauthorized' }, { status: 401 });
+    const message = err instanceof Error ? err.message : 'Unauthorized';
+    return NextResponse.json({ error: message }, { status: 401 });
   }
 }
 
@@ -75,9 +78,10 @@ export async function POST(req: NextRequest) {
         createdAt: userRecord.metadata.creationTime,
       },
     });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Error creating admin:', err);
-    return NextResponse.json({ error: err.message || 'Failed to create admin' }, { status: 500 });
+    const message = err instanceof Error ? err.message : 'Failed to create admin';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
 
@@ -109,8 +113,9 @@ export async function DELETE(req: NextRequest) {
     await adminAuth.deleteUser(uid);
 
     return NextResponse.json({ success: true });
-  } catch (err: any) {
+  } catch (err: unknown) {
     console.error('Error deleting admin:', err);
-    return NextResponse.json({ error: err.message || 'Failed to delete admin' }, { status: 500 });
+    const message = err instanceof Error ? err.message : 'Failed to delete admin';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

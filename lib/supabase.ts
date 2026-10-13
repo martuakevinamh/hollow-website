@@ -23,6 +23,7 @@ export type Member = {
   name_rp: string;
   rank: string;
   server: 'samp' | 'fivem' | 'both';
+  server_city: string | null;
   bio: string | null;
   photo_url: string | null;
   image_position?: string;
@@ -65,6 +66,9 @@ export type SiteSettings = {
   tiktok_fivem: string;
   youtube_fivem: string;
   instagram_fivem: string;
+  city_logo_mandalikarp: string;
+  city_logo_unionrp: string;
+  city_logo_nexaroleplay: string;
 };
 
 export const DEFAULT_SETTINGS: SiteSettings = {
@@ -82,6 +86,9 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   tiktok_fivem: '',
   youtube_fivem: '',
   instagram_fivem: '',
+  city_logo_mandalikarp: '',
+  city_logo_unionrp: '',
+  city_logo_nexaroleplay: '',
 };
 
 export async function getSettings(): Promise<SiteSettings> {
@@ -99,5 +106,35 @@ export async function getSettings(): Promise<SiteSettings> {
   } catch (err) {
     console.error('Error fetching settings:', err);
     return DEFAULT_SETTINGS;
+  }
+}
+
+export type ServerCity = {
+  id: string;
+  name: string;
+  server: 'samp' | 'fivem';
+  color: string;
+  logo_url: string | null;
+  sort_order: number;
+  is_active: boolean;
+};
+
+export const DEFAULT_SERVER_CITIES: ServerCity[] = [
+  { id: '1', name: 'MandalikaRP',   server: 'samp',  color: '#e2a02b', logo_url: null, sort_order: 1, is_active: true },
+  { id: '2', name: 'UnionRP',       server: 'samp',  color: '#6b7fe0', logo_url: null, sort_order: 2, is_active: true },
+  { id: '3', name: 'Nexa Roleplay', server: 'fivem', color: '#2bc5c0', logo_url: null, sort_order: 3, is_active: true },
+];
+
+export async function getServerCities(): Promise<ServerCity[]> {
+  try {
+    const { data, error } = await supabase
+      .from('server_cities')
+      .select('*')
+      .eq('is_active', true)
+      .order('sort_order', { ascending: true });
+    if (error || !data || data.length === 0) return DEFAULT_SERVER_CITIES;
+    return data;
+  } catch {
+    return DEFAULT_SERVER_CITIES;
   }
 }

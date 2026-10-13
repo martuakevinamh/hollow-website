@@ -36,6 +36,12 @@ const SERVER_BADGE: Record<string, string> = {
   both: 'badge-both',
 };
 
+const CITY_BADGE_COLOR: Record<string, string> = {
+  'MandalikaRP':   '#e2a02b',
+  'UnionRP':       '#6b7fe0',
+  'Nexa Roleplay': '#2bc5c0',
+};
+
 interface MembersListProps {
   initialMembers: Member[];
 }
@@ -149,6 +155,18 @@ export default function MembersList({ initialMembers }: MembersListProps) {
                       <span className={`badge ${SERVER_BADGE[member.server] ?? ''}`}>
                         {SERVER_LABELS[member.server] ?? member.server}
                       </span>
+                      {member.server_city && (
+                        <span
+                          className={styles.cityBadge}
+                          style={{
+                            background: `${CITY_BADGE_COLOR[member.server_city] ?? '#555'}22`,
+                            color: CITY_BADGE_COLOR[member.server_city] ?? '#ccc',
+                            border: `1px solid ${CITY_BADGE_COLOR[member.server_city] ?? '#555'}55`,
+                          }}
+                        >
+                          📍 {member.server_city}
+                        </span>
+                      )}
                       <span className={styles.joinDate}>
                         Joined {new Date(member.joined_at).getFullYear()}
                       </span>
