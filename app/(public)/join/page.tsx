@@ -1,7 +1,8 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { connection } from 'next/server';
-import { MessageSquare, BookOpen, UserCheck, Gamepad2 } from 'lucide-react';
+import { MessageSquare, BookOpen, UserCheck, Gamepad2, Check } from 'lucide-react';
+import { SAMPLogo, FiveMLogo } from '@/components/ServerLogos';
 import styles from './join.module.css';
 import { getSettings } from '@/lib/supabase';
 
@@ -76,7 +77,7 @@ export default async function JoinPage() {
               className={`btn btn-primary ${styles.discordBtn}`}
               id="join-discord-samp"
             >
-              🎮 SAMP Discord
+              <SAMPLogo size={18} /> SAMP Discord
             </a>
             {settings.discord_fivem && (
               <a
@@ -86,7 +87,7 @@ export default async function JoinPage() {
                 className={`btn btn-outline ${styles.discordBtn}`}
                 id="join-discord-fivem"
               >
-                🚗 FiveM Discord
+                <FiveMLogo size={18} /> FiveM Discord
               </a>
             )}
           </div>
@@ -131,7 +132,9 @@ export default async function JoinPage() {
               <ul className={styles.reqList}>
                 {requirements.map((req) => (
                   <li key={req} className={styles.reqItem}>
-                    <span className={styles.reqCheck}>✓</span>
+                    <span className={styles.reqCheck}>
+                      <Check size={12} strokeWidth={2.6} />
+                    </span>
                     {req}
                   </li>
                 ))}
@@ -159,10 +162,10 @@ export default async function JoinPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="btn btn-primary"
-                    style={{ flex: 1, justifyContent: 'center' }}
+                    style={{ flex: 1, justifyContent: 'center', gap: '8px' }}
                     id="join-discord-card-samp"
                   >
-                    🎮 SAMP
+                    <SAMPLogo size={16} /> SAMP
                   </a>
                   {settings.discord_fivem && (
                     <a
@@ -170,10 +173,10 @@ export default async function JoinPage() {
                       target="_blank"
                       rel="noopener noreferrer"
                       className="btn btn-outline"
-                      style={{ flex: 1, justifyContent: 'center' }}
+                      style={{ flex: 1, justifyContent: 'center', gap: '8px' }}
                       id="join-discord-card-fivem"
                     >
-                      🚗 FiveM
+                      <FiveMLogo size={16} /> FiveM
                     </a>
                   )}
                 </div>

@@ -2,6 +2,19 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
+import {
+  Crown,
+  Bird,
+  Target,
+  Handshake,
+  Flame,
+  Zap,
+  Dumbbell,
+  ShieldAlert,
+  MapPin,
+  Star,
+  type LucideIcon,
+} from 'lucide-react';
 import { SAMPLogo, FiveMLogo } from '@/components/ServerLogos';
 import { type Member } from '@/lib/supabase';
 import styles from './members.module.css';
@@ -16,14 +29,14 @@ const RANK_COLORS: Record<string, string> = {
   'The Youth':   '#86efac',
   'Muscle':      '#a0aec0',
 };
-const RANK_ICONS: Record<string, string> = {
-  'TOP OG/KING': '👑',
-  'OG':          '🦅',
-  'Top Boy':     '🎯',
-  'Brudda':      '🤜',
-  'Rude Boy':    '🔥',
-  'The Youth':   '⚡',
-  'Muscle':      '💪',
+const RANK_ICONS: Record<string, LucideIcon> = {
+  'TOP OG/KING': Crown,
+  'OG':          Bird,
+  'Top Boy':     Target,
+  'Brudda':      Handshake,
+  'Rude Boy':    Flame,
+  'The Youth':   Zap,
+  'Muscle':      Dumbbell,
 };
 const SERVER_LABELS: Record<string, string> = {
   samp: 'SAMP',
@@ -84,7 +97,9 @@ export default function MembersList({ initialMembers }: MembersListProps) {
       {isEmpty ? (
         /* Empty State */
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>🏴󠁧󠁢󠁥󠁮󠁧󠁿</div>
+          <div className={styles.emptyIcon}>
+            <ShieldAlert size={48} strokeWidth={1.5} />
+          </div>
           <h2 className={styles.emptyTitle}>Roster Segera Hadir</h2>
           <p className={styles.emptyDesc}>
             Data anggota untuk server ini sedang dalam proses pengisian. Nantikan lineup lengkap Hollow.
@@ -92,91 +107,109 @@ export default function MembersList({ initialMembers }: MembersListProps) {
         </div>
       ) : (
         /* Grouped by rank */
-        Object.entries(grouped).map(([rank, rankMembers]) => (
-          <div key={rank} className={styles.rankSection}>
-            <div className={styles.rankHeader}>
-              <span
-                className={styles.rankIcon}
-                style={{ color: RANK_COLORS[rank] ?? '#F5F5F5' }}
-              >
-                {RANK_ICONS[rank] ?? '⭐'}
-              </span>
-              <h2
-                className={styles.rankTitle}
-                style={{ color: RANK_COLORS[rank] ?? '#F5F5F5' }}
-              >
-                {rank}
-              </h2>
-              <span className={styles.rankCount}>{rankMembers.length}</span>
-              <div
-                className={styles.rankLine}
-                style={{ background: RANK_COLORS[rank] ?? '#F5F5F5' }}
-              />
-            </div>
+        Object.entries(grouped).map(([rank, rankMembers]) => {
+          const RankIcon = RANK_ICONS[rank] ?? Star;
 
-            <div className={styles.memberGrid}>
-              {rankMembers.map((member) => (
-                <div key={member.id} className={styles.memberCard}>
-                  {/* Avatar */}
-                  <div className={styles.avatarWrapper}>
-                    {member.photo_url ? (
-                      <Image
-                        src={member.photo_url}
-                        alt={member.name_rp}
-                        fill
-                        className={styles.avatarImg}
-                        sizes="(max-width: 640px) 80px, 96px"
-                        style={{ objectPosition: member.image_position || 'center center' }}
-                      />
-                    ) : (
-                      <div className={styles.avatarFallback}>
-                        {member.name_rp.charAt(0).toUpperCase()}
+          return (
+            <div key={rank} className={styles.rankSection}>
+              <div className={styles.rankHeader}>
+                <span
+                  className={styles.rankIcon}
+                  style={{ color: RANK_COLORS[rank] ?? '#F5F5F5' }}
+                >
+                  <RankIcon size={22} strokeWidth={1.8} />
+                </span>
+                <h2
+                  className={styles.rankTitle}
+                  style={{ color: RANK_COLORS[rank] ?? '#F5F5F5' }}
+                >
+                  {rank}
+                </h2>
+                <span className={styles.rankCount}>{rankMembers.length}</span>
+                <div
+                  className={styles.rankLine}
+                  style={{ background: RANK_COLORS[rank] ?? '#F5F5F5' }}
+                />
+              </div>
+
+              <div className={styles.memberGrid}>
+                {rankMembers.map((member) => {
+                  const MemberRankIcon = RANK_ICONS[member.rank] ?? Star;
+
+                  return (
+                    <div key={member.id} className={styles.memberCard}>
+                      {/* Avatar */}
+                      <div className={styles.avatarWrapper}>
+                        {member.photo_url ? (
+                          <Image
+                            src={member.photo_url}
+                            alt={member.name_rp}
+                            fill
+                            className={styles.avatarImg}
+                            sizes="(max-width: 640px) 80px, 96px"
+                            style={{ objectPosition: member.image_position || 'center center' }}
+                          />
+                        ) : (
+                          <div className={styles.avatarFallback}>
+                            {member.name_rp.charAt(0).toUpperCase()}
+                          </div>
+                        )}
+                        <div
+                          className={styles.avatarBorder}
+                          style={{ borderColor: RANK_COLORS[member.rank] ?? '#F5F5F5' }}
+                        />
                       </div>
-                    )}
-                    <div
-                      className={styles.avatarBorder}
-                      style={{ borderColor: RANK_COLORS[member.rank] ?? '#F5F5F5' }}
-                    />
-                  </div>
 
-                  {/* Info */}
-                  <div className={styles.memberInfo}>
-                    <h3 className={styles.memberName}>{member.name_rp}</h3>
-                    <span
-                      className={styles.memberRank}
-                      style={{ color: RANK_COLORS[member.rank] ?? '#F5F5F5' }}
-                    >
-                      {RANK_ICONS[member.rank]} {member.rank}
-                    </span>
-                    {member.bio && (
-                      <p className={styles.memberBio}>{member.bio}</p>
-                    )}
-                    <div className={styles.memberMeta}>
-                      <span className={`badge ${SERVER_BADGE[member.server] ?? ''}`}>
-                        {SERVER_LABELS[member.server] ?? member.server}
-                      </span>
-                      {member.server_city && (
+                      {/* Info */}
+                      <div className={styles.memberInfo}>
+                        <h3 className={styles.memberName}>{member.name_rp}</h3>
                         <span
-                          className={styles.cityBadge}
+                          className={styles.memberRank}
                           style={{
-                            background: `${CITY_BADGE_COLOR[member.server_city] ?? '#555'}22`,
-                            color: CITY_BADGE_COLOR[member.server_city] ?? '#ccc',
-                            border: `1px solid ${CITY_BADGE_COLOR[member.server_city] ?? '#555'}55`,
+                            color: RANK_COLORS[member.rank] ?? '#F5F5F5',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            gap: '5px',
                           }}
                         >
-                          📍 {member.server_city}
+                          <MemberRankIcon size={13} strokeWidth={2} />
+                          {member.rank}
                         </span>
-                      )}
-                      <span className={styles.joinDate}>
-                        Joined {new Date(member.joined_at).getFullYear()}
-                      </span>
+                        {member.bio && (
+                          <p className={styles.memberBio}>{member.bio}</p>
+                        )}
+                        <div className={styles.memberMeta}>
+                          <span className={`badge ${SERVER_BADGE[member.server] ?? ''}`}>
+                            {SERVER_LABELS[member.server] ?? member.server}
+                          </span>
+                          {member.server_city && (
+                            <span
+                              className={styles.cityBadge}
+                              style={{
+                                background: `${CITY_BADGE_COLOR[member.server_city] ?? '#555'}22`,
+                                color: CITY_BADGE_COLOR[member.server_city] ?? '#ccc',
+                                border: `1px solid ${CITY_BADGE_COLOR[member.server_city] ?? '#555'}55`,
+                                display: 'inline-flex',
+                                alignItems: 'center',
+                                gap: '4px',
+                              }}
+                            >
+                              <MapPin size={11} />
+                              {member.server_city}
+                            </span>
+                          )}
+                          <span className={styles.joinDate}>
+                            Joined {new Date(member.joined_at).getFullYear()}
+                          </span>
+                        </div>
+                      </div>
                     </div>
-                  </div>
-                </div>
-              ))}
+                  );
+                })}
+              </div>
             </div>
-          </div>
-        ))
+          );
+        })
       )}
     </div>
   );

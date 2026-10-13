@@ -312,9 +312,25 @@
 }
 
 .featureIcon {
-  font-size: 2rem;
-  margin-bottom: 16px;
-  display: block;
+  width: 48px;
+  height: 48px;
+  border-radius: var(--radius-md);
+  background: rgba(178, 34, 52, 0.08);
+  border: 1px solid rgba(178, 34, 52, 0.22);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--crimson-bright);
+  margin-bottom: 20px;
+  transition: all var(--transition);
+}
+
+.featureCard:hover .featureIcon {
+  background: rgba(178, 34, 52, 0.18);
+  border-color: var(--crimson);
+  color: #ffffff;
+  transform: scale(1.08);
+  box-shadow: 0 0 16px rgba(178, 34, 52, 0.35);
 }
 
 .featureTitle {

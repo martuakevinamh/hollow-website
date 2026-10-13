@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { connection } from 'next/server';
+import { Camera } from 'lucide-react';
 import { supabase, type GalleryItem } from '@/lib/supabase';
 import { GalleryGrid } from './GalleryClient';
 import styles from './gallery.module.css';
@@ -55,7 +56,9 @@ export default async function GalleryPage() {
         <div className="container">
           {isEmpty ? (
             <div className={styles.emptyState}>
-              <div className={styles.emptyIcon}>📸</div>
+              <div className={styles.emptyIcon}>
+                <Camera size={44} strokeWidth={1.5} />
+              </div>
               <h2 className={styles.emptyTitle}>Gallery Segera Hadir</h2>
               <p className={styles.emptyDesc}>
                 Koleksi foto Hollow sedang dalam proses pengisian. Stay tuned!

@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase, type NewsItem } from '@/lib/supabase';
 import Image from 'next/image';
-import { FilePlus, Edit2, Trash2, Newspaper, ImagePlus } from 'lucide-react';
+import { FilePlus, Edit2, Trash2, Newspaper, ImagePlus, X } from 'lucide-react';
 import styles from './news-admin.module.css';
 
 export default function NewsAdmin() {
@@ -242,7 +242,7 @@ export default function NewsAdmin() {
         <div className={styles.filters}>
           <input
             type="text"
-            placeholder="🔍 Search title or author..."
+            placeholder="Search title or author..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={styles.searchInput}
@@ -368,7 +368,7 @@ export default function NewsAdmin() {
             <div className={styles.modalHeader}>
               <h3>{editingId ? 'Edit News Article' : 'Publish News Article'}</h3>
               <button onClick={() => setIsFormOpen(false)} className={styles.modalClose}>
-                ✕
+                <X size={18} />
               </button>
             </div>
 

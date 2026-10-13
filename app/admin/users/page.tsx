@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useCallback } from 'react';
+import { Lock, AlertTriangle, CheckCircle2, UserPlus, Trash2, X } from 'lucide-react';
 import { useAuth } from '@/components/AuthProvider';
 import styles from './users-admin.module.css';
 
@@ -173,7 +174,9 @@ export default function UsersAdmin() {
   if (currentRole !== 'utama') {
     return (
       <div style={{ padding: '40px', textAlign: 'center', background: 'var(--bg-card)', border: '1px solid var(--border)', borderRadius: 'var(--radius-lg)' }}>
-        <h2 style={{ fontFamily: 'var(--font-display)', color: 'var(--crimson)', marginBottom: '12px' }}>🔒 Akses Ditolak</h2>
+        <h2 style={{ fontFamily: 'var(--font-display)', color: 'var(--crimson)', marginBottom: '12px', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px' }}>
+          <Lock size={22} /> Akses Ditolak
+        </h2>
         <p style={{ color: 'var(--white-dim)', fontSize: '0.9rem' }}>
           Hanya <strong>Admin Utama</strong> yang memiliki hak akses untuk mengelola akun administrator lainnya.
         </p>
@@ -183,21 +186,21 @@ export default function UsersAdmin() {
 
   return (
     <div className={styles.container}>
-      {error && <div className={styles.errorAlert}>⚠️ {error}</div>}
-      {success && <div className={styles.successAlert}>✅ {success}</div>}
+      {error && <div className={styles.errorAlert} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><AlertTriangle size={16} /> {error}</div>}
+      {success && <div className={styles.successAlert} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} /> {success}</div>}
 
       <div className={styles.controlBar}>
         <div className={styles.filters}>
           <input
             type="text"
-            placeholder="🔍 Search admin email..."
+            placeholder="Search admin email..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={styles.searchInput}
           />
         </div>
-        <button onClick={handleAddOpen} className="btn btn-primary">
-          🔑 Add New Admin
+        <button onClick={handleAddOpen} className="btn btn-primary" style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}>
+          <UserPlus size={16} /> Add New Admin
         </button>
       </div>
 
@@ -266,8 +269,9 @@ export default function UsersAdmin() {
                             className={styles.deleteBtn}
                             title="Delete admin account"
                             disabled={isSelf}
+                            style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                           >
-                            🗑️ Delete
+                            <Trash2 size={13} /> Delete
                           </button>
                         </div>
                       </td>
@@ -287,7 +291,7 @@ export default function UsersAdmin() {
             <div className={styles.modalHeader}>
               <h3>Create New Admin Account</h3>
               <button onClick={() => setIsFormOpen(false)} className={styles.modalClose}>
-                ✕
+                <X size={18} />
               </button>
             </div>
 

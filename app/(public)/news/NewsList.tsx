@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { Newspaper } from 'lucide-react';
 import { SAMPLogo, FiveMLogo } from '@/components/ServerLogos';
 import { type NewsItem } from '@/lib/supabase';
 import styles from './news.module.css';
@@ -50,7 +51,9 @@ export default function NewsList({ initialNews }: NewsListProps) {
 
       {isEmpty ? (
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>📰</div>
+          <div className={styles.emptyIcon}>
+            <Newspaper size={44} strokeWidth={1.5} />
+          </div>
           <h2 className={styles.emptyTitle}>Belum Ada Berita</h2>
           <p className={styles.emptyDesc}>
             Berita dan pengumuman Hollow untuk server ini akan segera hadir di sini. Stay tuned!
@@ -73,7 +76,7 @@ export default function NewsList({ initialNews }: NewsListProps) {
                   />
                 ) : (
                   <div className={styles.featuredImgFallback}>
-                    <span>📰</span>
+                    <Newspaper size={36} strokeWidth={1.5} />
                   </div>
                 )}
                 <div className={styles.featuredOverlay} />
@@ -110,7 +113,9 @@ export default function NewsList({ initialNews }: NewsListProps) {
                         sizes="(max-width: 640px) 100vw, 33vw"
                       />
                     ) : (
-                      <div className={styles.newsImgFallback}>📰</div>
+                      <div className={styles.newsImgFallback}>
+                        <Newspaper size={24} strokeWidth={1.5} />
+                      </div>
                     )}
                   </div>
                   <div className={styles.newsCardBody}>

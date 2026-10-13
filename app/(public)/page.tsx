@@ -2,7 +2,19 @@ import Image from 'next/image';
 import Link from 'next/link';
 import type { Metadata } from 'next';
 import { connection } from 'next/server';
-import { supabase, getSettings, getServerCities, type Member } from '@/lib/supabase';
+import {
+  Swords,
+  Crown,
+  Users,
+  Drama,
+  Trophy,
+  Gamepad2,
+  MapPin,
+  Building2,
+  Shield,
+  Check,
+} from 'lucide-react';
+import { supabase, getServerCities, type Member } from '@/lib/supabase';
 import styles from './page.module.css';
 
 export const metadata: Metadata = {
@@ -69,32 +81,32 @@ const FALLBACK_SPOTLIGHT: Member[] = [
 
 const features = [
   {
-    icon: '⚔️',
+    icon: Swords,
     title: 'Gang Warfare',
     desc: 'Rebut wilayah, lindungi blok, dan dominasi jalanan dalam perang gang yang epik.',
   },
   {
-    icon: '🏴󠁧󠁢󠁥󠁮󠁧󠁿',
+    icon: Crown,
     title: 'UK Authentic',
     desc: 'Tema UK sejati — dari slang, fashion, hingga budaya street yang autentik di dunia RP.',
   },
   {
-    icon: '👥',
+    icon: Users,
     title: 'Komunitas Solid',
     desc: 'Lebih dari 200 anggota aktif yang saling mendukung dan menjaga kesolidan gang.',
   },
   {
-    icon: '🎭',
+    icon: Drama,
     title: 'Deep Roleplay',
     desc: 'Cerita, karakter, dan interaksi yang mendalam untuk pengalaman RP yang tak terlupakan.',
   },
   {
-    icon: '🏆',
+    icon: Trophy,
     title: 'Rank System',
     desc: 'Naiki hirarki dari Street Soldier hingga Boss lewat dedikasi dan loyalitas.',
   },
   {
-    icon: '🎮',
+    icon: Gamepad2,
     title: 'Multi Platform',
     desc: 'Hadir di GTA SAMP dan GTA FiveM — pilih platform favoritmu dan bergabung bersama kami.',
   },
@@ -106,7 +118,6 @@ export default async function Home() {
 
   let memberCount = 0;
   let spotlightMembers: Member[] = [];
-  const settings = await getSettings();
   const cities = await getServerCities();
   const sampCities = cities.filter((c) => c.server === 'samp');
   const fivemCities = cities.filter((c) => c.server === 'fivem');
@@ -140,7 +151,6 @@ export default async function Home() {
       cities: sampCities.map((c) => ({
         name: c.name,
         color: c.color,
-        icon: '🏙️',
         logoUrl: c.logo_url,
       })),
     },
@@ -153,7 +163,6 @@ export default async function Home() {
       cities: fivemCities.map((c) => ({
         name: c.name,
         color: c.color,
-        icon: '🌃',
         logoUrl: c.logo_url,
       })),
     },
@@ -197,7 +206,10 @@ export default async function Home() {
           </div>
 
           <div className={styles.heroTag}>
-            <span>🏴󠁧󠁢󠁥󠁮󠁧󠁿 GTA SAMP & FIVEM ROLEPLAY</span>
+            <span>
+              <Shield size={13} strokeWidth={2.2} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '6px' }} />
+              GTA SAMP &amp; FIVEM ROLEPLAY
+            </span>
           </div>
 
           <h1 className={styles.heroTitle}>
@@ -265,7 +277,10 @@ export default async function Home() {
 
                 {/* Kota Aktif */}
                 <div className={styles.serverCities}>
-                  <span className={styles.serverCitiesLabel}>📍 Aktif di</span>
+                  <span className={styles.serverCitiesLabel}>
+                    <MapPin size={13} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '4px' }} />
+                    Aktif di
+                  </span>
                   <div className={styles.serverCityTags}>
                     {server.cities.map((city) => (
                       <span
@@ -287,7 +302,7 @@ export default async function Home() {
                             unoptimized
                           />
                         ) : (
-                          <span>{city.icon}</span>
+                          <Building2 size={13} style={{ opacity: 0.85 }} />
                         )}
                         <span>{city.name}</span>
                       </span>
@@ -298,7 +313,9 @@ export default async function Home() {
                 <ul className={styles.serverFeatures}>
                   {server.features.map((f) => (
                     <li key={f} className={styles.serverFeature}>
-                      <span className={styles.featureCheck}>✓</span>
+                      <span className={styles.featureCheck}>
+                        <Check size={12} strokeWidth={2.6} />
+                      </span>
                       {f}
                     </li>
                   ))}
@@ -325,17 +342,22 @@ export default async function Home() {
           </div>
 
           <div className="grid-3">
-            {features.map((feat, i) => (
-              <div
-                key={feat.title}
-                className={styles.featureCard}
-                style={{ animationDelay: `${i * 0.1}s` }}
-              >
-                <div className={styles.featureIcon}>{feat.icon}</div>
-                <h3 className={styles.featureTitle}>{feat.title}</h3>
-                <p className={styles.featureDesc}>{feat.desc}</p>
-              </div>
-            ))}
+            {features.map((feat, i) => {
+              const IconComp = feat.icon;
+              return (
+                <div
+                  key={feat.title}
+                  className={styles.featureCard}
+                  style={{ animationDelay: `${i * 0.1}s` }}
+                >
+                  <div className={styles.featureIcon}>
+                    <IconComp size={22} strokeWidth={1.8} />
+                  </div>
+                  <h3 className={styles.featureTitle}>{feat.title}</h3>
+                  <p className={styles.featureDesc}>{feat.desc}</p>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
@@ -394,7 +416,8 @@ export default async function Home() {
                   </div>
                   {member.server_city && (
                     <span className={styles.previewCityTag}>
-                      📍 {member.server_city}
+                      <MapPin size={11} style={{ display: 'inline-block', verticalAlign: 'middle', marginRight: '3px' }} />
+                      {member.server_city}
                     </span>
                   )}
                 </div>

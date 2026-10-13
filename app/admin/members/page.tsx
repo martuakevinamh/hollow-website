@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase, type Member, type ServerCity, DEFAULT_SERVER_CITIES } from '@/lib/supabase';
 import Image from 'next/image';
-import { UserPlus, Edit2, Trash2, User, Camera } from 'lucide-react';
+import { UserPlus, Edit2, Trash2, User, Camera, X } from 'lucide-react';
 import styles from './members-admin.module.css';
 
 const RANKS = ['TOP OG/KING', 'OG', 'Top Boy', 'Brudda', 'Rude Boy', 'The Youth', 'Muscle'];
@@ -250,7 +250,7 @@ export default function MembersAdmin() {
         <div className={styles.filters}>
           <input
             type="text"
-            placeholder="🔍 Search name..."
+            placeholder="Search name..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={styles.searchInput}
@@ -385,7 +385,7 @@ export default function MembersAdmin() {
             <div className={styles.modalHeader}>
               <h3>{editingId ? 'Edit Roster Member' : 'Add Roster Member'}</h3>
               <button onClick={() => setIsFormOpen(false)} className={styles.modalClose}>
-                ✕
+                <X size={18} />
               </button>
             </div>
 

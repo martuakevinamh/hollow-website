@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { SAMPLogo, FiveMLogo } from '@/components/ServerLogos';
-import { Play, Pause } from 'lucide-react';
+import { Play, Pause, X, ChevronLeft, ChevronRight, Camera, ZoomIn } from 'lucide-react';
 import type { GalleryItem } from '@/lib/supabase';
 import styles from './lightbox.module.css';
 
@@ -43,13 +43,13 @@ export function Lightbox({ items, initialIndex, onClose }: LightboxProps) {
       <div className={styles.lightbox} onClick={(e) => e.stopPropagation()}>
         {/* Close */}
         <button className={styles.close} onClick={onClose} aria-label="Close lightbox">
-          ✕
+          <X size={20} strokeWidth={2} />
         </button>
 
         {/* Navigation prev */}
         {items.length > 1 && (
           <button className={`${styles.navBtn} ${styles.prev}`} onClick={prev} aria-label="Previous photo">
-            ‹
+            <ChevronLeft size={24} strokeWidth={2} />
           </button>
         )}
 
@@ -68,7 +68,7 @@ export function Lightbox({ items, initialIndex, onClose }: LightboxProps) {
         {/* Navigation next */}
         {items.length > 1 && (
           <button className={`${styles.navBtn} ${styles.next}`} onClick={next} aria-label="Next photo">
-            ›
+            <ChevronRight size={24} strokeWidth={2} />
           </button>
         )}
 
@@ -126,7 +126,9 @@ export function GalleryGrid({ items }: GalleryGridProps) {
 
       {filteredItems.length === 0 ? (
         <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>📸</div>
+          <div className={styles.emptyIcon}>
+            <Camera size={44} strokeWidth={1.5} />
+          </div>
           <h2 className={styles.emptyTitle}>Gallery Segera Hadir</h2>
           <p className={styles.emptyDesc}>
             Koleksi foto Hollow untuk server ini sedang dalam proses pengisian. Stay tuned!
@@ -150,7 +152,9 @@ export function GalleryGrid({ items }: GalleryGridProps) {
                   sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
                 />
                 <div className={styles.gridOverlay}>
-                  <span className={styles.viewIcon}>🔍</span>
+                  <span className={styles.viewIcon}>
+                    <ZoomIn size={18} strokeWidth={2} />
+                  </span>
                   <span className={styles.gridTitle}>{item.title}</span>
                 </div>
               </div>

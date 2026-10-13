@@ -3,6 +3,23 @@
 import { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import {
+  Settings,
+  BookOpen,
+  Gamepad2,
+  Building2,
+  Share2,
+  AlertTriangle,
+  CheckCircle2,
+  Pencil,
+  Plus,
+  RefreshCw,
+  Upload,
+  Trash2,
+  Save,
+  Loader2,
+  type LucideIcon,
+} from 'lucide-react';
+import {
   supabase,
   type SiteSettings,
   DEFAULT_SETTINGS,
@@ -289,29 +306,33 @@ export default function SettingsAdmin() {
   return (
     <div className={styles.container}>
       <div className={styles.titleSection}>
-        <h2>⚙️ Hollow Site Settings</h2>
+        <h2 style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+          <Settings size={24} color="var(--crimson-bright)" /> Hollow Site Settings
+        </h2>
         <p>Kelola konten dinamis, cerita About Us, server kota aktif, dan tautan sosial media resmi Hollow.</p>
       </div>
 
       <div className={styles.tabs}>
         {([
-          ['about',   '📖 Cerita Utama'],
-          ['servers', '🎮 Konten Server'],
-          ['logos',   '🏙️ Server Kota & Logo'],
-          ['socials', '📱 Sosial Media'],
-        ] as [Tab, string][]).map(([tab, label]) => (
+          ['about',   'Cerita Utama', BookOpen],
+          ['servers', 'Konten Server', Gamepad2],
+          ['logos',   'Server Kota & Logo', Building2],
+          ['socials', 'Sosial Media', Share2],
+        ] as [Tab, string, LucideIcon][]).map(([tab, label, TabIcon]) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
             className={`${styles.tabBtn} ${activeTab === tab ? styles.activeTabBtn : ''}`}
+            style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
           >
+            <TabIcon size={16} />
             {label}
           </button>
         ))}
       </div>
 
-      {error   && <div className={styles.errorAlert}>⚠️ {error}</div>}
-      {success && <div className={styles.successAlert}>✅ {success}</div>}
+      {error   && <div className={styles.errorAlert} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><AlertTriangle size={16} /> {error}</div>}
+      {success && <div className={styles.successAlert} style={{ display: 'flex', alignItems: 'center', gap: '8px' }}><CheckCircle2 size={16} /> {success}</div>}
 
       <div className={styles.card}>
         <form onSubmit={handleSubmit} className={styles.form}>
@@ -418,8 +439,16 @@ export default function SettingsAdmin() {
               {/* Form Tambah/Edit Kota */}
               {isCityFormOpen && (
                 <div className={styles.addCityBox}>
-                  <h4 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--white)' }}>
-                    {editingCityId ? '✏️ Edit Server Kota' : '➕ Tambah Server Kota Baru'}
+                  <h4 style={{ margin: 0, fontSize: '0.9rem', color: 'var(--white)', display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    {editingCityId ? (
+                      <>
+                        <Pencil size={14} /> Edit Server Kota
+                      </>
+                    ) : (
+                      <>
+                        <Plus size={14} /> Tambah Server Kota Baru
+                      </>
+                    )}
                   </h4>
                   <div className={styles.cityFormGrid}>
                     <div className={styles.formField}>
@@ -524,7 +553,7 @@ export default function SettingsAdmin() {
                             className={styles.logoPlaceholder}
                             style={{ borderColor: `${city.color}55`, color: city.color }}
                           >
-                            🏙️
+                            <Building2 size={24} style={{ opacity: 0.8 }} />
                           </div>
                         )}
                       </div>
@@ -560,11 +589,23 @@ export default function SettingsAdmin() {
                         <button
                           type="button"
                           className="btn btn-outline"
-                          style={{ padding: '6px 12px', fontSize: '0.75rem' }}
+                          style={{ padding: '6px 12px', fontSize: '0.75rem', display: 'inline-flex', alignItems: 'center', gap: '6px' }}
                           disabled={isUploading}
                           onClick={() => fileRefs.current[city.id]?.click()}
                         >
-                          {isUploading ? '⏳ Uploading...' : city.logo_url ? '🔄 Ganti Logo' : '📤 Upload Logo'}
+                          {isUploading ? (
+                            <>
+                              <Loader2 size={13} className="animate-spin" /> Uploading...
+                            </>
+                          ) : city.logo_url ? (
+                            <>
+                              <RefreshCw size={13} /> Ganti Logo
+                            </>
+                          ) : (
+                            <>
+                              <Upload size={13} /> Upload Logo
+                            </>
+                          )}
                         </button>
 
                         {city.logo_url && (
@@ -583,8 +624,9 @@ export default function SettingsAdmin() {
                           className={styles.actionBtn}
                           onClick={() => handleOpenEditCity(city)}
                           title="Edit nama atau warna kota"
+                          style={{ display: 'inline-flex', alignItems: 'center', gap: '4px' }}
                         >
-                          ✏️ Edit
+                          <Pencil size={13} /> Edit
                         </button>
 
                         <button
@@ -593,7 +635,7 @@ export default function SettingsAdmin() {
                           onClick={() => handleDeleteCity(city.id, city.name)}
                           title="Hapus kota dari sistem"
                         >
-                          🗑️
+                          <Trash2 size={14} />
                         </button>
                       </div>
                     </div>
@@ -655,8 +697,21 @@ export default function SettingsAdmin() {
           {/* Save button — only for non-city tabs (city actions save immediately) */}
           {activeTab !== 'logos' && (
             <div className={styles.formActions}>
-              <button type="submit" className="btn btn-primary" disabled={saving}>
-                {saving ? 'Saving...' : '💾 Simpan Perubahan'}
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={saving}
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px' }}
+              >
+                {saving ? (
+                  <>
+                    <Loader2 size={16} className="animate-spin" /> Saving...
+                  </>
+                ) : (
+                  <>
+                    <Save size={16} /> Simpan Perubahan
+                  </>
+                )}
               </button>
             </div>
           )}

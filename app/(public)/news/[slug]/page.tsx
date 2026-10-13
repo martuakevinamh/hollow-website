@@ -3,6 +3,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import { connection } from 'next/server';
+import { Newspaper } from 'lucide-react';
 import { supabase, type NewsItem } from '@/lib/supabase';
 import styles from './detail.module.css';
 
@@ -186,7 +187,9 @@ export default async function NewsDetailPage({ params }: PageProps) {
                         sizes="(max-width: 640px) 100vw, 33vw"
                       />
                     ) : (
-                      <div className={styles.relatedImgFallback}>📰</div>
+                      <div className={styles.relatedImgFallback}>
+                        <Newspaper size={24} strokeWidth={1.5} />
+                      </div>
                     )}
                   </div>
                   <div className={styles.relatedBody}>
