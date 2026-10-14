@@ -62,6 +62,7 @@
   margin-bottom: 48px;
   transition: all var(--transition);
   min-height: 380px;
+  cursor: default;
 }
 
 .featuredCard:hover {
@@ -138,18 +139,37 @@
   color: var(--white-dim);
 }
 
+.titleLink {
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.titleLink:hover .featuredTitle,
+.titleLink:hover .newsCardTitle {
+  color: var(--crimson-bright);
+}
+
 .readMore {
   font-family: var(--font-display);
   font-size: 0.8rem;
   letter-spacing: 0.1em;
-  color: var(--crimson);
+  color: var(--crimson-bright);
   text-transform: uppercase;
   margin-top: auto;
-  transition: color var(--transition);
+  transition: all var(--transition);
+  cursor: pointer;
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  padding: 6px 0;
 }
 
-.featuredCard:hover .readMore {
-  color: var(--crimson-light);
+.readMore:hover {
+  color: #ffffff;
+  transform: translateX(4px);
 }
 
 /* News Grid */
@@ -179,6 +199,7 @@
   transition: all var(--transition);
   display: flex;
   flex-direction: column;
+  cursor: default;
 }
 
 .newsCard:hover {
@@ -250,14 +271,22 @@
   font-family: var(--font-display);
   font-size: 0.75rem;
   letter-spacing: 0.1em;
-  color: var(--crimson);
+  color: var(--crimson-bright);
   text-transform: uppercase;
   margin-top: auto;
-  transition: color var(--transition);
+  transition: all var(--transition);
+  cursor: pointer;
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  text-decoration: none;
+  padding: 4px 0;
 }
 
-.newsCard:hover .readMoreSm {
-  color: var(--crimson-light);
+.readMoreSm:hover {
+  color: #ffffff;
+  transform: translateX(3px);
 }
 
 /* Tab Buttons */

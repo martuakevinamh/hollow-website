@@ -5,7 +5,10 @@ import { notFound } from 'next/navigation';
 import { connection } from 'next/server';
 import { Newspaper } from 'lucide-react';
 import { supabase, type NewsItem } from '@/lib/supabase';
+import { ArticleAlbum } from './ArticleAlbum';
 import styles from './detail.module.css';
+
+export const dynamic = 'force-dynamic';
 
 // params is a Promise in Next.js 16
 type PageProps = {
@@ -17,15 +20,38 @@ async function getArticle(slug: string): Promise<NewsItem | null> {
   await connection();
 
   try {
-    const { data, error } = await supabase
+    const raw = decodeURIComponent(slug || '').trim();
+    const withoutTrailingDash = raw.replace(/-+$/, '');
+
+    // 1. Try finding by raw slug (whether published or draft)
+    let { data } = await supabase
       .from('news')
       .select('*')
-      .eq('slug', slug)
-      .eq('is_published', true)
-      .single();
+      .eq('slug', raw)
+      .maybeSingle();
 
-    if (error || !data) return null;
-    return data;
+    // 2. If not found and had trailing dash, try without trailing dash
+    if (!data && withoutTrailingDash !== raw) {
+      const res = await supabase
+        .from('news')
+        .select('*')
+        .eq('slug', withoutTrailingDash)
+        .maybeSingle();
+      data = res.data;
+    }
+
+    // 3. Fallback: case-insensitive ilike match
+    if (!data) {
+      const res = await supabase
+        .from('news')
+        .select('*')
+        .ilike('slug', `${withoutTrailingDash}%`)
+        .maybeSingle();
+      data = res.data;
+    }
+
+    if (!data) return null;
+    return data as NewsItem;
   } catch {
     return null;
   }
@@ -51,26 +77,24 @@ async function getRelated(currentSlug: string): Promise<NewsItem[]> {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { slug } = await params;
   const article = await getArticle(slug);
-  if (!article) return { title: 'Artikel tidak ditemukan' };
+  if (!article) return { title: 'Artikel Tidak Ditemukan | Hollow' };
 
   return {
-    title: article.title,
-    description: `${article.title} — Ditulis oleh ${article.author} di Hollow.`,
+    title: `${article.title} | Hollow`,
+    description: `${article.title} — Ditulis oleh ${article.author || 'Admin'} di Hollow.`,
     openGraph: {
       title: article.title,
-      description: `Berita dari Hollow oleh ${article.author}.`,
+      description: `Berita dari Hollow oleh ${article.author || 'Admin'}.`,
       images: article.cover_image_url ? [article.cover_image_url] : [],
     },
   };
 }
 
-export async function generateStaticParams() {
-  // Return empty array: all slug paths rendered on first request
-  return [];
-}
-
-function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString('id-ID', {
+function formatDate(dateStr?: string | null) {
+  if (!dateStr) return '';
+  const d = new Date(dateStr);
+  if (isNaN(d.getTime())) return '';
+  return d.toLocaleDateString('id-ID', {
     weekday: 'long',
     day: 'numeric',
     month: 'long',
@@ -84,7 +108,27 @@ export default async function NewsDetailPage({ params }: PageProps) {
 
   if (!article) notFound();
 
-  const related = await getRelated(slug);
+  const related = await getRelated(article.slug || slug);
+
+  // Extract album photos (from native gallery_images column or embedded tag)
+  let albumImages: string[] = [];
+  if (Array.isArray(article.gallery_images) && article.gallery_images.length > 0) {
+    albumImages = article.gallery_images.filter(Boolean);
+  }
+
+  let cleanContent = article.content || '';
+  if (cleanContent.includes('<!--hollow_gallery:')) {
+    const match = cleanContent.match(/<!--hollow_gallery:(.*?)-->/);
+    if (match) {
+      try {
+        const parsed = JSON.parse(match[1]);
+        if (Array.isArray(parsed) && albumImages.length === 0) {
+          albumImages = parsed.filter(Boolean);
+        }
+      } catch {}
+      cleanContent = cleanContent.replace(/<!--hollow_gallery:(.*?)-->/g, '').trim();
+    }
+  }
 
   return (
     <>
@@ -94,11 +138,12 @@ export default async function NewsDetailPage({ params }: PageProps) {
           <div className={styles.heroBg}>
             <Image
               src={article.cover_image_url}
-              alt={article.title}
+              alt={article.title || 'News Cover'}
               fill
               priority
               quality={85}
               style={{ objectFit: 'cover', objectPosition: 'center' }}
+              unoptimized
             />
             <div className={styles.heroOverlay} />
           </div>
@@ -111,9 +156,9 @@ export default async function NewsDetailPage({ params }: PageProps) {
             ← Kembali ke News
           </Link>
           <div className={styles.articleMeta}>
-            <span className={styles.author}>By {article.author}</span>
+            <span className={styles.author}>By {article.author || 'Admin'}</span>
             <span className={styles.dot}>·</span>
-            <time className={styles.date} dateTime={article.published_at}>
+            <time className={styles.date} dateTime={article.published_at || undefined}>
               {formatDate(article.published_at)}
             </time>
           </div>
@@ -127,10 +172,13 @@ export default async function NewsDetailPage({ params }: PageProps) {
           <div className={styles.articleLayout}>
             {/* Content */}
             <article className={styles.articleContent}>
-              {/* Render content paragraphs */}
-              {article.content.split('\n\n').map((para, i) => (
+              {cleanContent.split('\n\n').filter(Boolean).map((para, i) => (
                 <p key={i}>{para}</p>
               ))}
+
+              {albumImages.length > 0 && (
+                <ArticleAlbum title={article.title} images={albumImages} />
+              )}
             </article>
 
             {/* Sidebar */}
@@ -139,10 +187,10 @@ export default async function NewsDetailPage({ params }: PageProps) {
                 <h3 className={styles.sidebarTitle}>Tentang Penulis</h3>
                 <div className={styles.authorCard}>
                   <div className={styles.authorAvatar}>
-                    {article.author.charAt(0).toUpperCase()}
+                    {(article.author || 'Admin').charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <div className={styles.authorName}>{article.author}</div>
+                    <div className={styles.authorName}>{article.author || 'Admin'}</div>
                     <div className={styles.authorRole}>Hollow</div>
                   </div>
                 </div>
@@ -154,7 +202,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
                   <dt>Dipublikasikan</dt>
                   <dd>{formatDate(article.published_at)}</dd>
                   <dt>Penulis</dt>
-                  <dd>{article.author}</dd>
+                  <dd>{article.author || 'Admin'}</dd>
                 </dl>
               </div>
 
@@ -181,10 +229,11 @@ export default async function NewsDetailPage({ params }: PageProps) {
                     {item.cover_image_url ? (
                       <Image
                         src={item.cover_image_url}
-                        alt={item.title}
+                        alt={item.title || 'Related article'}
                         fill
                         className={styles.relatedThumb}
                         sizes="(max-width: 640px) 100vw, 33vw"
+                        unoptimized
                       />
                     ) : (
                       <div className={styles.relatedImgFallback}>
@@ -195,7 +244,7 @@ export default async function NewsDetailPage({ params }: PageProps) {
                   <div className={styles.relatedBody}>
                     <h3 className={styles.relatedTitle}>{item.title}</h3>
                     <span className={styles.relatedDate}>
-                      {new Date(item.published_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' })}
+                      {formatDate(item.published_at)}
                     </span>
                   </div>
                 </Link>

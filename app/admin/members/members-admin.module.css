@@ -385,3 +385,116 @@
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+/* Multi-select and Bulk Action Bar */
+.bulkBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(18, 18, 26, 0.95);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(178, 34, 52, 0.4);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6), 0 0 20px rgba(178, 34, 52, 0.2);
+  border-radius: var(--radius-md);
+  padding: 12px 20px;
+  animation: slideDown 0.2s ease;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+@keyframes slideDown {
+  from { opacity: 0; transform: translateY(-6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.bulkInfo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 0.85rem;
+  color: var(--white);
+  font-weight: 500;
+}
+
+.bulkCountPill {
+  background: var(--crimson);
+  color: var(--white);
+  padding: 2px 10px;
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+}
+
+.bulkActions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.bulkDeleteBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--crimson);
+  color: var(--white);
+  border: 1px solid var(--crimson-light);
+  padding: 8px 18px;
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bulkDeleteBtn:hover {
+  background: #e62235;
+  box-shadow: 0 0 16px rgba(230, 34, 53, 0.5);
+  transform: translateY(-1px);
+}
+
+.bulkDeleteBtn:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.bulkDeselectBtn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border);
+  color: var(--white-dim);
+  padding: 8px 14px;
+  border-radius: var(--radius);
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.bulkDeselectBtn:hover {
+  color: var(--white);
+  border-color: rgba(255, 255, 255, 0.3);
+}
+
+.checkboxCell {
+  width: 44px;
+  text-align: center;
+  padding: 16px 12px !important;
+}
+
+.rowCheckbox {
+  width: 17px;
+  height: 17px;
+  accent-color: var(--crimson);
+  cursor: pointer;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+.selectedRow {
+  background: rgba(178, 34, 52, 0.08) !important;
+}
+

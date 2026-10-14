@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase, type NewsItem } from '@/lib/supabase';
 import Image from 'next/image';
-import { FilePlus, Edit2, Trash2, Newspaper, ImagePlus, X } from 'lucide-react';
+import { FilePlus, Edit2, Trash2, Newspaper, ImagePlus, X, Layers } from 'lucide-react';
 import styles from './news-admin.module.css';
 
 export default function NewsAdmin() {
@@ -33,6 +33,11 @@ export default function NewsAdmin() {
   const [uploading, setUploading] = useState(false);
   const [coverUrl, setCoverUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Album / Gallery State
+  const [galleryUrls, setGalleryUrls] = useState<string[]>([]);
+  const [uploadingGallery, setUploadingGallery] = useState(false);
+  const galleryInputRef = useRef<HTMLInputElement>(null);
 
   // Members list for author selection
   const [members, setMembers] = useState<{ name_rp: string; rank: string }[]>([]);
@@ -82,7 +87,9 @@ export default function NewsAdmin() {
       .toLowerCase()
       .trim()
       .replace(/[^a-z0-9\s-]/g, '') // remove special characters
-      .replace(/\s+/g, '-'); // replace spaces with hyphens
+      .replace(/\s+/g, '-') // replace spaces with hyphens
+      .replace(/-+/g, '-') // collapse multiple hyphens
+      .replace(/^-+|-+$/g, ''); // strip leading/trailing hyphens
 
     setForm((prev) => ({
       ...prev,
@@ -103,21 +110,44 @@ export default function NewsAdmin() {
       server: 'samp',
     });
     setCoverUrl(null);
+    setGalleryUrls([]);
     setIsFormOpen(true);
   };
 
   const handleEditOpen = (item: NewsItem) => {
     setEditingId(item.id);
+
+    // Extract album photos if existing
+    let initialGallery: string[] = [];
+    if (Array.isArray(item.gallery_images) && item.gallery_images.length > 0) {
+      initialGallery = item.gallery_images.filter(Boolean);
+    }
+
+    let editContent = item.content || '';
+    if (editContent.includes('<!--hollow_gallery:')) {
+      const match = editContent.match(/<!--hollow_gallery:(.*?)-->/);
+      if (match) {
+        try {
+          const parsed = JSON.parse(match[1]);
+          if (Array.isArray(parsed) && initialGallery.length === 0) {
+            initialGallery = parsed.filter(Boolean);
+          }
+        } catch {}
+        editContent = editContent.replace(/<!--hollow_gallery:(.*?)-->/g, '').trim();
+      }
+    }
+
     setForm({
       title: item.title,
       slug: item.slug,
-      content: item.content,
+      content: editContent,
       author: item.author,
       published_at: new Date(item.published_at).toISOString().split('T')[0],
       is_published: item.is_published,
       server: item.server || 'both',
     });
     setCoverUrl(item.cover_image_url);
+    setGalleryUrls(initialGallery);
     setIsFormOpen(true);
   };
 
@@ -155,11 +185,51 @@ export default function NewsAdmin() {
     }
   };
 
+  const handleGalleryUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      if (!e.target.files || e.target.files.length === 0) return;
+      setUploadingGallery(true);
+      setError('');
+
+      const files = Array.from(e.target.files);
+      const uploadedUrls: string[] = [];
+
+      for (const file of files) {
+        const fileExt = file.name.split('.').pop();
+        const fileName = `album-${Date.now()}-${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+        const filePath = `${fileName}`;
+
+        const { error: uploadError } = await supabase.storage
+          .from('gallery-images')
+          .upload(filePath, file);
+
+        if (uploadError) throw uploadError;
+
+        const { data } = supabase.storage
+          .from('gallery-images')
+          .getPublicUrl(filePath);
+
+        uploadedUrls.push(data.publicUrl);
+      }
+
+      setGalleryUrls((prev) => [...prev, ...uploadedUrls]);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Gagal mengupload foto album');
+    } finally {
+      setUploadingGallery(false);
+      if (galleryInputRef.current) galleryInputRef.current.value = '';
+    }
+  };
+
+  const removeGalleryPhoto = (index: number) => {
+    setGalleryUrls((prev) => prev.filter((_, i) => i !== index));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
 
-    const payload = {
+    const basePayload = {
       title: form.title,
       slug: form.slug,
       content: form.content,
@@ -171,19 +241,63 @@ export default function NewsAdmin() {
     };
 
     try {
-      if (editingId) {
-        const { error } = await supabase
-          .from('news')
-          .update(payload)
-          .eq('id', editingId);
+      // 1. Try saving with native gallery_images column
+      let saveError: unknown = null;
+      try {
+        const payloadWithGallery = {
+          ...basePayload,
+          gallery_images: galleryUrls,
+        };
 
-        if (error) throw error;
-      } else {
-        const { error } = await supabase
-          .from('news')
-          .insert([payload]);
+        if (editingId) {
+          const { error } = await supabase
+            .from('news')
+            .update(payloadWithGallery)
+            .eq('id', editingId);
+          if (error) saveError = error;
+        } else {
+          const { error } = await supabase
+            .from('news')
+            .insert([payloadWithGallery]);
+          if (error) saveError = error;
+        }
+      } catch (dbErr) {
+        saveError = dbErr;
+      }
 
-        if (error) throw error;
+      // 2. Fallback gracefully if gallery_images column does not exist yet on Supabase
+      if (saveError) {
+        const errMsg = (saveError as { message?: string }).message || '';
+        const isColumnMissing =
+          errMsg.includes('gallery_images') ||
+          errMsg.includes('schema cache') ||
+          errMsg.includes('column');
+
+        if (isColumnMissing) {
+          const embeddedContent = galleryUrls.length > 0
+            ? `${form.content.trim()}\n\n<!--hollow_gallery:${JSON.stringify(galleryUrls)}-->`
+            : form.content;
+
+          const fallbackPayload = {
+            ...basePayload,
+            content: embeddedContent,
+          };
+
+          if (editingId) {
+            const { error: fallbackErr } = await supabase
+              .from('news')
+              .update(fallbackPayload)
+              .eq('id', editingId);
+            if (fallbackErr) throw fallbackErr;
+          } else {
+            const { error: fallbackErr } = await supabase
+              .from('news')
+              .insert([fallbackPayload]);
+            if (fallbackErr) throw fallbackErr;
+          }
+        } else {
+          throw saveError;
+        }
       }
 
       setIsFormOpen(false);
@@ -319,7 +433,14 @@ export default function NewsAdmin() {
                         )}
                       </div>
                     </td>
-                    <td className={styles.newsTitle}>{item.title}</td>
+                    <td className={styles.newsTitle}>
+                      <div>{item.title}</div>
+                      {((Array.isArray(item.gallery_images) && item.gallery_images.length > 0) || (item.content && item.content.includes('<!--hollow_gallery:'))) && (
+                        <span className={styles.albumTableBadge}>
+                          <Layers size={11} /> Album Galeri
+                        </span>
+                      )}
+                    </td>
                     <td className={styles.slugCell}><code>/{item.slug}</code></td>
                     <td>
                       <span className={styles.serverBadge}>{item.server}</span>
@@ -382,6 +503,7 @@ export default function NewsAdmin() {
                       fill
                       style={{ objectFit: 'cover' }}
                       sizes="160px"
+                      unoptimized
                     />
                   ) : (
                     <div className={styles.previewFallback}>
@@ -408,6 +530,81 @@ export default function NewsAdmin() {
                   </button>
                   <p className={styles.uploadHint}>Recommmended 16:9 ratio. JPG or PNG. Max size 2MB.</p>
                 </div>
+              </div>
+
+              {/* Album Photos Section (Multiple Photos) */}
+              <div className={styles.albumSection}>
+                <div className={styles.albumHeader}>
+                  <div className={styles.albumLabelWrap}>
+                    <span className={styles.albumLabel}>
+                      <Layers size={14} style={{ display: 'inline', marginRight: 6 }} /> Album Foto Dokumentasi
+                    </span>
+                    <span className={styles.albumCountBadge}>{galleryUrls.length} Foto</span>
+                  </div>
+                  <div className={styles.albumActions}>
+                    {galleryUrls.length > 0 && (
+                      <button
+                        type="button"
+                        onClick={() => setGalleryUrls([])}
+                        className={styles.clearAlbumBtn}
+                      >
+                        Hapus Semua
+                      </button>
+                    )}
+                    <input
+                      type="file"
+                      ref={galleryInputRef}
+                      onChange={handleGalleryUpload}
+                      accept="image/*"
+                      multiple
+                      style={{ display: 'none' }}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => galleryInputRef.current?.click()}
+                      className="btn btn-outline"
+                      style={{ padding: '6px 14px', fontSize: '0.75rem', display: 'flex', alignItems: 'center', gap: '6px' }}
+                      disabled={uploadingGallery}
+                    >
+                      <ImagePlus size={14} />
+                      {uploadingGallery ? 'Mengupload Foto...' : '+ Tambah Foto ke Album'}
+                    </button>
+                  </div>
+                </div>
+
+                {galleryUrls.length === 0 ? (
+                  <div className={styles.albumEmptyBox}>
+                    <Layers size={22} strokeWidth={1.5} color="var(--white-dim)" />
+                    <p>Belum ada foto tambahan di album artikel ini.</p>
+                    <span style={{ fontSize: '0.72rem', opacity: 0.6 }}>
+                      Pilih banyak foto sekaligus (screenshot roleplay, perang wilayah, event, dll).
+                    </span>
+                  </div>
+                ) : (
+                  <div className={styles.albumGrid}>
+                    {galleryUrls.map((url, idx) => (
+                      <div key={idx} className={styles.albumThumbItem}>
+                        <Image
+                          src={url}
+                          alt={`Album ${idx + 1}`}
+                          fill
+                          className={styles.albumThumbImg}
+                          sizes="90px"
+                          unoptimized
+                        />
+                        <span className={styles.albumThumbIndex}>#{idx + 1}</span>
+                        <button
+                          type="button"
+                          onClick={() => removeGalleryPhoto(idx)}
+                          className={styles.albumThumbDelete}
+                          title="Hapus foto ini"
+                        >
+                          <X size={12} />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className={styles.formField}>

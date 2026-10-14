@@ -63,8 +63,8 @@ export default function NewsList({ initialNews }: NewsListProps) {
         <>
           {/* Featured Post */}
           {featured && (
-            <Link href={`/news/${featured.slug}`} className={styles.featuredCard} id="news-featured">
-              <div className={styles.featuredImg}>
+            <div className={styles.featuredCard} id="news-featured">
+              <Link href={`/news/${featured.slug}`} className={styles.featuredImg}>
                 {featured.cover_image_url ? (
                   <Image
                     src={featured.cover_image_url}
@@ -73,6 +73,7 @@ export default function NewsList({ initialNews }: NewsListProps) {
                     className={styles.featuredThumb}
                     priority
                     sizes="(max-width: 768px) 100vw, 60vw"
+                    unoptimized
                   />
                 ) : (
                   <div className={styles.featuredImgFallback}>
@@ -80,30 +81,30 @@ export default function NewsList({ initialNews }: NewsListProps) {
                   </div>
                 )}
                 <div className={styles.featuredOverlay} />
-              </div>
+              </Link>
               <div className={styles.featuredContent}>
                 <span className={styles.featuredBadge}>Featured</span>
-                <h2 className={styles.featuredTitle}>{featured.title}</h2>
+                <Link href={`/news/${featured.slug}`} className={styles.titleLink}>
+                  <h2 className={styles.featuredTitle}>{featured.title}</h2>
+                </Link>
                 <div className={styles.featuredMeta}>
                   <span className={styles.author}>By {featured.author}</span>
                   <span className={styles.dot}>·</span>
                   <span className={styles.date}>{formatDate(featured.published_at)}</span>
                 </div>
-                <span className={styles.readMore}>Baca Selengkapnya →</span>
+                <Link href={`/news/${featured.slug}`} className={styles.readMore}>
+                  Baca Selengkapnya →
+                </Link>
               </div>
-            </Link>
+            </div>
           )}
 
           {/* Rest of articles */}
           {rest.length > 0 && (
             <div className={styles.newsGrid}>
               {rest.map((item) => (
-                <Link
-                  key={item.id}
-                  href={`/news/${item.slug}`}
-                  className={styles.newsCard}
-                >
-                  <div className={styles.newsCardImg}>
+                <div key={item.id} className={styles.newsCard}>
+                  <Link href={`/news/${item.slug}`} className={styles.newsCardImg}>
                     {item.cover_image_url ? (
                       <Image
                         src={item.cover_image_url}
@@ -111,23 +112,28 @@ export default function NewsList({ initialNews }: NewsListProps) {
                         fill
                         className={styles.newsThumb}
                         sizes="(max-width: 640px) 100vw, 33vw"
+                        unoptimized
                       />
                     ) : (
                       <div className={styles.newsImgFallback}>
                         <Newspaper size={24} strokeWidth={1.5} />
                       </div>
                     )}
-                  </div>
+                  </Link>
                   <div className={styles.newsCardBody}>
-                    <h3 className={styles.newsCardTitle}>{item.title}</h3>
+                    <Link href={`/news/${item.slug}`} className={styles.titleLink}>
+                      <h3 className={styles.newsCardTitle}>{item.title}</h3>
+                    </Link>
                     <div className={styles.newsMeta}>
                       <span className={styles.author}>By {item.author}</span>
                       <span className={styles.dot}>·</span>
                       <span className={styles.date}>{formatDate(item.published_at)}</span>
                     </div>
-                    <span className={styles.readMoreSm}>Baca →</span>
+                    <Link href={`/news/${item.slug}`} className={styles.readMoreSm}>
+                      Baca Selengkapnya →
+                    </Link>
                   </div>
-                </Link>
+                </div>
               ))}
             </div>
           )}

@@ -50,6 +50,10 @@ export default function MembersAdmin() {
   const [photoUrl, setPhotoUrl] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // Multi-select State
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [isBulkDeleting, setIsBulkDeleting] = useState(false);
+
   useEffect(() => {
     fetchMembers();
   }, []);
@@ -227,9 +231,58 @@ export default function MembersAdmin() {
         .eq('id', id);
 
       if (error) throw error;
+      setSelectedIds((prev) => prev.filter((i) => i !== id));
       fetchMembers();
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Failed to delete member');
+    }
+  };
+
+  // Multi-select handlers
+  const toggleSelectRow = (id: string) => {
+    setSelectedIds((prev) =>
+      prev.includes(id) ? prev.filter((i) => i !== id) : [...prev, id]
+    );
+  };
+
+  const isAllSelected =
+    filteredMembers.length > 0 &&
+    filteredMembers.every((m) => selectedIds.includes(m.id));
+
+  const toggleSelectAll = () => {
+    if (isAllSelected) {
+      setSelectedIds([]);
+    } else {
+      setSelectedIds(filteredMembers.map((m) => m.id));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedIds.length === 0) return;
+    if (
+      !confirm(
+        `Apakah Anda yakin ingin menghapus ${selectedIds.length} member yang dipilih secara permanen?`
+      )
+    ) {
+      return;
+    }
+
+    setIsBulkDeleting(true);
+    setError('');
+    try {
+      const { error } = await supabase
+        .from('members')
+        .delete()
+        .in('id', selectedIds);
+
+      if (error) throw error;
+
+      setSelectedIds([]);
+      fetchMembers();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Gagal menghapus member terpilih');
+    } finally {
+      setIsBulkDeleting(false);
     }
   };
 
@@ -284,6 +337,34 @@ export default function MembersAdmin() {
         </button>
       </div>
 
+      {/* Bulk Action Bar */}
+      {selectedIds.length > 0 && (
+        <div className={styles.bulkBar}>
+          <div className={styles.bulkInfo}>
+            <span className={styles.bulkCountPill}>{selectedIds.length}</span>
+            <span>Member terpilih untuk tindakan massal</span>
+          </div>
+          <div className={styles.bulkActions}>
+            <button
+              type="button"
+              onClick={() => setSelectedIds([])}
+              className={styles.bulkDeselectBtn}
+            >
+              Batal Pilihan
+            </button>
+            <button
+              type="button"
+              onClick={handleBulkDelete}
+              className={styles.bulkDeleteBtn}
+              disabled={isBulkDeleting}
+            >
+              <Trash2 size={15} />
+              {isBulkDeleting ? 'Menghapus...' : `Hapus ${selectedIds.length} Member`}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* Roster Listing Table */}
       {loading ? (
         <div className={styles.loading}>
@@ -295,6 +376,15 @@ export default function MembersAdmin() {
           <table className={styles.table}>
             <thead>
               <tr>
+                <th className={styles.checkboxCell}>
+                  <input
+                    type="checkbox"
+                    className={styles.rowCheckbox}
+                    checked={isAllSelected}
+                    onChange={toggleSelectAll}
+                    aria-label="Select all members"
+                  />
+                </th>
                 <th>Avatar</th>
                 <th>RP Name</th>
                 <th>Rank</th>
@@ -308,13 +398,25 @@ export default function MembersAdmin() {
             <tbody>
               {filteredMembers.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className={styles.noData}>
+                  <td colSpan={9} className={styles.noData}>
                     No members found. Add some members to build your gang roster.
                   </td>
                 </tr>
               ) : (
                 filteredMembers.map((member) => (
-                  <tr key={member.id}>
+                  <tr
+                    key={member.id}
+                    className={selectedIds.includes(member.id) ? styles.selectedRow : ''}
+                  >
+                    <td className={styles.checkboxCell}>
+                      <input
+                        type="checkbox"
+                        className={styles.rowCheckbox}
+                        checked={selectedIds.includes(member.id)}
+                        onChange={() => toggleSelectRow(member.id)}
+                        aria-label={`Select ${member.name_rp}`}
+                      />
+                    </td>
                     <td>
                       <div className={styles.tableAvatar}>
                         {member.photo_url ? (

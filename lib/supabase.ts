@@ -38,6 +38,7 @@ export type NewsItem = {
   content: string;
   server: 'samp' | 'fivem' | 'both';
   cover_image_url: string | null;
+  gallery_images?: string[] | null;
   author: string;
   published_at: string;
   is_published: boolean;

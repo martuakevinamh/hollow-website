@@ -1,0 +1,517 @@
+/* ============================================
+   ARTICLE ALBUM & LIGHTBOX COMPONENT
+   ============================================ */
+
+.albumSection {
+  margin-top: 48px;
+  padding-top: 36px;
+  border-top: 1px solid var(--border);
+}
+
+.albumHeader {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+
+.tagline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--crimson);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+
+.albumTitle {
+  font-family: var(--font-display);
+  font-size: clamp(1.25rem, 2.5vw, 1.75rem);
+  font-weight: 800;
+  color: var(--white);
+  line-height: 1.2;
+}
+
+.photoCountBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  background: rgba(178, 34, 52, 0.12);
+  border: 1px solid rgba(178, 34, 52, 0.35);
+  border-radius: 999px;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: #ff8890;
+}
+
+/* ============================================
+   COLLAGE GRIDS
+   ============================================ */
+
+/* Single Image */
+.singleGrid {
+  position: relative;
+  width: 100%;
+  height: 420px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  background: var(--bg-card);
+}
+
+/* Two Images */
+.twoGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
+}
+
+.twoGridItem {
+  position: relative;
+  height: 320px;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  background: var(--bg-card);
+}
+
+/* Three Images */
+.threeGrid {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 14px;
+  height: 440px;
+}
+
+.threeGridMain {
+  position: relative;
+  height: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  background: var(--bg-card);
+}
+
+.threeGridStack {
+  display: grid;
+  grid-template-rows: 1fr 1fr;
+  gap: 14px;
+  height: 100%;
+}
+
+.threeGridStackItem {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  background: var(--bg-card);
+}
+
+/* Four or more images: Magazine Collage */
+.magazineGrid {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: 14px;
+  height: 480px;
+}
+
+.magazineMain {
+  position: relative;
+  height: 100%;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  background: var(--bg-card);
+}
+
+.magazineStack {
+  display: grid;
+  grid-template-rows: repeat(3, 1fr);
+  gap: 14px;
+  height: 100%;
+}
+
+.magazineThumb {
+  position: relative;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  background: var(--bg-card);
+}
+
+/* Common Image & Hover Zoom */
+.albumImg {
+  object-fit: cover;
+  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.gridItemInteractive:hover .albumImg {
+  transform: scale(1.04);
+}
+
+.itemOverlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.6) 0%, transparent 60%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  display: flex;
+  align-items: flex-end;
+  padding: 14px;
+}
+
+.gridItemInteractive:hover .itemOverlay {
+  opacity: 1;
+}
+
+.zoomBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--white);
+  font-size: 0.75rem;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 500;
+}
+
+/* More Photos Overlay on the last thumbnail */
+.moreOverlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(9, 9, 15, 0.85);
+  backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  color: var(--white);
+  transition: background 0.3s ease;
+}
+
+.gridItemInteractive:hover .moreOverlay {
+  background: rgba(178, 34, 52, 0.85);
+}
+
+.moreCount {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+}
+
+.moreLabel {
+  font-size: 0.7rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+/* Action Bar below collage */
+.albumFooter {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 14px;
+  padding: 12px 18px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.albumNote {
+  font-size: 0.8rem;
+  color: var(--white-dim);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.openAlbumBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(178, 34, 52, 0.15);
+  border: 1px solid var(--crimson);
+  color: var(--white);
+  padding: 8px 18px;
+  border-radius: var(--radius);
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.openAlbumBtn:hover {
+  background: var(--crimson);
+  box-shadow: 0 0 16px rgba(178, 34, 52, 0.5);
+  transform: translateY(-1px);
+}
+
+/* ============================================
+   FULLSCREEN ALBUM LIGHTBOX
+   ============================================ */
+.lightboxBackdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(5, 5, 8, 0.96);
+  backdrop-filter: blur(16px);
+  display: flex;
+  flex-direction: column;
+  animation: fadeIn 0.25s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lightboxHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 28px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  flex-shrink: 0;
+}
+
+.lightboxTitleWrap {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-width: 60%;
+}
+
+.lightboxSubtitle {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  color: var(--crimson);
+  font-weight: 700;
+}
+
+.lightboxArticleTitle {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--white);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.lightboxControls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.counterPill {
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--white-dim);
+  background: rgba(255, 255, 255, 0.06);
+  padding: 6px 14px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.controlBtn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--white);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.controlBtn:hover {
+  background: rgba(178, 34, 52, 0.3);
+  border-color: var(--crimson);
+  color: var(--white);
+}
+
+.closeBtn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--white);
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.closeBtn:hover {
+  background: var(--crimson);
+  border-color: var(--crimson);
+}
+
+/* Lightbox Stage */
+.lightboxStage {
+  position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px 80px;
+  overflow: hidden;
+}
+
+.mainImageWrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  max-width: 1200px;
+  max-height: 80vh;
+}
+
+.stageNavBtn {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  background: rgba(10, 10, 15, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: var(--white);
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  z-index: 10;
+  backdrop-filter: blur(8px);
+}
+
+.stageNavBtn:hover {
+  background: var(--crimson);
+  border-color: var(--crimson);
+  transform: translateY(-50%) scale(1.08);
+}
+
+.prevBtn { left: 24px; }
+.nextBtn { right: 24px; }
+
+/* Lightbox Filmstrip */
+.lightboxFilmstrip {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 16px 28px;
+  background: rgba(0, 0, 0, 0.4);
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  overflow-x: auto;
+  flex-shrink: 0;
+  scrollbar-width: thin;
+}
+
+.filmstripThumb {
+  position: relative;
+  width: 72px;
+  height: 48px;
+  border-radius: 4px;
+  overflow: hidden;
+  flex-shrink: 0;
+  cursor: pointer;
+  border: 2px solid transparent;
+  opacity: 0.45;
+  transition: all 0.2s ease;
+  background: #111;
+}
+
+.filmstripThumb:hover {
+  opacity: 0.85;
+}
+
+.filmstripActive {
+  opacity: 1 !important;
+  border-color: var(--crimson) !important;
+  box-shadow: 0 0 12px rgba(178, 34, 52, 0.6);
+  transform: scale(1.06);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .magazineGrid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .magazineMain {
+    height: 280px;
+  }
+
+  .magazineStack {
+    grid-template-columns: repeat(3, 1fr);
+    grid-template-rows: 1fr;
+    height: 100px;
+  }
+
+  .threeGrid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .threeGridMain {
+    height: 260px;
+  }
+
+  .threeGridStack {
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    height: 120px;
+  }
+
+  .lightboxStage {
+    padding: 10px;
+  }
+
+  .stageNavBtn {
+    width: 40px;
+    height: 40px;
+  }
+
+  .prevBtn { left: 8px; }
+  .nextBtn { right: 8px; }
+
+  .filmstripThumb {
+    width: 56px;
+    height: 38px;
+  }
+}

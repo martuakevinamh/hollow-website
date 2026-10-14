@@ -22,6 +22,9 @@ CREATE TABLE IF NOT EXISTS public.members (
 -- Migration: tambahkan kolom server_city jika belum ada (untuk database yang sudah exist)
 ALTER TABLE public.members ADD COLUMN IF NOT EXISTS server_city TEXT;
 
+-- Migration: tambahkan kolom gallery_images untuk album foto di artikel
+ALTER TABLE public.news ADD COLUMN IF NOT EXISTS gallery_images TEXT[] DEFAULT '{}';
+
 -- Index untuk sorting
 CREATE INDEX IF NOT EXISTS idx_members_rank ON public.members(rank);
 CREATE INDEX IF NOT EXISTS idx_members_active ON public.members(is_active);
