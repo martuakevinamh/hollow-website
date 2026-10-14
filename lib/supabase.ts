@@ -50,6 +50,28 @@ export type GalleryItem = {
   image_url: string;
   server: 'samp' | 'fivem' | 'both';
   uploaded_at: string;
+  album_id?: string | null;
+};
+
+export type GalleryAlbum = {
+  id: string;
+  title: string;
+  description: string | null;
+  server: 'samp' | 'fivem' | 'both';
+  cover_url: string | null;
+  event_date: string;
+  created_at: string;
+  photo_count?: number;
+  video_count?: number;
+};
+
+export type GalleryVideo = {
+  id: string;
+  title: string;
+  tiktok_url: string;
+  album_id: string | null;
+  server: 'samp' | 'fivem' | 'both';
+  created_at: string;
 };
 
 export type SiteSettings = {

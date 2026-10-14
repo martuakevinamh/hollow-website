@@ -3,8 +3,20 @@
 import { useState, useEffect, useCallback } from 'react';
 import Image from 'next/image';
 import { SAMPLogo, FiveMLogo } from '@/components/ServerLogos';
-import { Play, Pause, X, ChevronLeft, ChevronRight, Camera, ZoomIn } from 'lucide-react';
-import type { GalleryItem } from '@/lib/supabase';
+import Link from 'next/link';
+import {
+  Play,
+  Pause,
+  X,
+  ChevronLeft,
+  ChevronRight,
+  Camera,
+  ZoomIn,
+  FolderOpen,
+  Film,
+  ArrowRight,
+} from 'lucide-react';
+import type { GalleryItem, GalleryAlbum } from '@/lib/supabase';
 import styles from './lightbox.module.css';
 
 interface LightboxProps {
@@ -95,10 +107,14 @@ export function Lightbox({ items, initialIndex, onClose }: LightboxProps) {
 
 interface GalleryGridProps {
   items: GalleryItem[];
+  albums?: GalleryAlbum[];
 }
 
-export function GalleryGrid({ items }: GalleryGridProps) {
+export function GalleryGrid({ items, albums = [] }: GalleryGridProps) {
   const [activeTab, setActiveTab] = useState<'samp' | 'fivem'>('samp');
+  const [viewMode, setViewMode] = useState<'albums' | 'photos'>(
+    albums.length > 0 ? 'albums' : 'photos'
+  );
   const [lightboxIndex, setLightboxIndex] = useState<number | null>(null);
 
   // Filter items based on active tab and database server column
@@ -106,9 +122,33 @@ export function GalleryGrid({ items }: GalleryGridProps) {
     (item) => item.server === activeTab || item.server === 'both'
   );
 
+  const filteredAlbums = albums.filter(
+    (album) => album.server === activeTab || album.server === 'both'
+  );
+
   return (
     <>
-      {/* Tab Switcher */}
+      {/* Mode Switcher: Albums vs Photos */}
+      <div className={styles.modeSwitcher}>
+        <button
+          type="button"
+          onClick={() => setViewMode('albums')}
+          className={`${styles.modeBtn} ${viewMode === 'albums' ? styles.activeMode : ''}`}
+        >
+          <FolderOpen size={16} />
+          <span>Album Event ({filteredAlbums.length})</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setViewMode('photos')}
+          className={`${styles.modeBtn} ${viewMode === 'photos' ? styles.activeMode : ''}`}
+        >
+          <Camera size={16} />
+          <span>Semua Foto ({filteredItems.length})</span>
+        </button>
+      </div>
+
+      {/* Server Tab Switcher */}
       <div className={styles.tabButtons}>
         <button
           onClick={() => setActiveTab('samp')}
@@ -124,51 +164,146 @@ export function GalleryGrid({ items }: GalleryGridProps) {
         </button>
       </div>
 
-      {filteredItems.length === 0 ? (
-        <div className={styles.emptyState}>
-          <div className={styles.emptyIcon}>
-            <Camera size={44} strokeWidth={1.5} />
-          </div>
-          <h2 className={styles.emptyTitle}>Gallery Segera Hadir</h2>
-          <p className={styles.emptyDesc}>
-            Koleksi foto Hollow untuk server ini sedang dalam proses pengisian. Stay tuned!
-          </p>
-        </div>
-      ) : (
-        <div className={styles.grid}>
-          {filteredItems.map((item, i) => (
-            <button
-              key={item.id}
-              className={styles.gridItem}
-              onClick={() => setLightboxIndex(i)}
-              aria-label={`View photo: ${item.title}`}
-            >
-              <div className={styles.gridImg}>
-                <Image
-                  src={item.image_url}
-                  alt={item.title}
-                  fill
-                  className={styles.thumb}
-                  sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-                />
-                <div className={styles.gridOverlay}>
-                  <span className={styles.viewIcon}>
-                    <ZoomIn size={18} strokeWidth={2} />
-                  </span>
-                  <span className={styles.gridTitle}>{item.title}</span>
-                </div>
+      {/* ALBUMS VIEW */}
+      {viewMode === 'albums' && (
+        <>
+          {filteredAlbums.length === 0 ? (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>
+                <FolderOpen size={44} strokeWidth={1.5} />
               </div>
-            </button>
-          ))}
-        </div>
+              <h2 className={styles.emptyTitle}>Belum Ada Album Event</h2>
+              <p className={styles.emptyDesc}>
+                Dokumentasi event & aksi Hollow untuk server ini sedang dipersiapkan. Cek tab &quot;Semua Foto&quot; untuk dokumentasi harian.
+              </p>
+            </div>
+          ) : (
+            <div className={styles.albumGrid}>
+              {filteredAlbums.map((album) => {
+                const eventDateFormatted = album.event_date
+                  ? new Date(album.event_date).toLocaleDateString('id-ID', {
+                      day: 'numeric',
+                      month: 'short',
+                      year: 'numeric',
+                    })
+                  : null;
+
+                return (
+                  <Link
+                    key={album.id}
+                    href={`/gallery/albums/${album.id}`}
+                    className={styles.albumCard}
+                  >
+                    <div className={styles.albumCoverWrapper}>
+                      {album.cover_url ? (
+                        <Image
+                          src={album.cover_url}
+                          alt={album.title}
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          className={styles.albumCoverImg}
+                        />
+                      ) : (
+                        <div className={styles.albumCoverPlaceholder}>
+                          <FolderOpen size={36} strokeWidth={1.2} />
+                          <span>Hollow Album</span>
+                        </div>
+                      )}
+
+                      <div className={styles.albumBadges}>
+                        <span className={styles.albumServerBadge}>
+                          {album.server === 'both' ? 'SAMP & FIVEM' : album.server.toUpperCase()}
+                        </span>
+                      </div>
+
+                      <div className={styles.albumMediaCount}>
+                        <span className={styles.countGroup}>
+                          <Camera size={13} />
+                          <span>{album.photo_count ?? 0}</span>
+                        </span>
+                        <span className={styles.countGroup}>
+                          <Film size={13} />
+                          <span>{album.video_count ?? 0}</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className={styles.albumBody}>
+                      <h3 className={styles.albumTitle}>{album.title}</h3>
+                      {album.description && (
+                        <p className={styles.albumDesc}>{album.description}</p>
+                      )}
+
+                      <div className={styles.albumFooter}>
+                        {eventDateFormatted ? (
+                          <span>{eventDateFormatted}</span>
+                        ) : (
+                          <span>Event Hollow</span>
+                        )}
+                        <span className={styles.viewAlbumAction}>
+                          <span>Buka Album</span>
+                          <ArrowRight size={13} />
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+        </>
       )}
 
-      {lightboxIndex !== null && (
-        <Lightbox
-          items={filteredItems}
-          initialIndex={lightboxIndex}
-          onClose={() => setLightboxIndex(null)}
-        />
+      {/* INDIVIDUAL PHOTOS VIEW */}
+      {viewMode === 'photos' && (
+        <>
+          {filteredItems.length === 0 ? (
+            <div className={styles.emptyState}>
+              <div className={styles.emptyIcon}>
+                <Camera size={44} strokeWidth={1.5} />
+              </div>
+              <h2 className={styles.emptyTitle}>Gallery Segera Hadir</h2>
+              <p className={styles.emptyDesc}>
+                Koleksi foto Hollow untuk server ini sedang dalam proses pengisian. Stay tuned!
+              </p>
+            </div>
+          ) : (
+            <div className={styles.grid}>
+              {filteredItems.map((item, i) => (
+                <button
+                  key={item.id}
+                  className={styles.gridItem}
+                  onClick={() => setLightboxIndex(i)}
+                  aria-label={`View photo: ${item.title}`}
+                >
+                  <div className={styles.gridImg}>
+                    <Image
+                      src={item.image_url}
+                      alt={item.title}
+                      fill
+                      className={styles.thumb}
+                      sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                    />
+                    <div className={styles.gridOverlay}>
+                      <span className={styles.viewIcon}>
+                        <ZoomIn size={18} strokeWidth={2} />
+                      </span>
+                      <span className={styles.gridTitle}>{item.title}</span>
+                    </div>
+                  </div>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {lightboxIndex !== null && (
+            <Lightbox
+              items={filteredItems}
+              initialIndex={lightboxIndex}
+              onClose={() => setLightboxIndex(null)}
+            />
+          )}
+        </>
       )}
     </>
   );

@@ -1,19 +1,17 @@
 import type { Metadata } from 'next';
 import { connection } from 'next/server';
 import { Camera } from 'lucide-react';
-import { supabase, type GalleryItem } from '@/lib/supabase';
+import { supabase, type GalleryItem, type GalleryAlbum } from '@/lib/supabase';
 import { GalleryGrid } from './GalleryClient';
 import styles from './gallery.module.css';
 
 export const metadata: Metadata = {
-  title: 'Gallery',
-  description: 'Koleksi foto dan momen terbaik dari Hollow — komunitas gangster UK di GTA SAMP dan FiveM.',
+  title: 'Gallery & Albums',
+  description: 'Koleksi album event, video TikTok, dan dokumentasi foto Hollow di GTA SAMP dan FiveM.',
 };
 
 async function getGallery(): Promise<GalleryItem[]> {
-  // Opt out of static prerendering — always fetch fresh data from DB
   await connection();
-
   try {
     const { data, error } = await supabase
       .from('gallery')
@@ -27,9 +25,41 @@ async function getGallery(): Promise<GalleryItem[]> {
   }
 }
 
+async function getAlbums(): Promise<GalleryAlbum[]> {
+  await connection();
+  try {
+    const { data: albumsData, error } = await supabase
+      .from('gallery_albums')
+      .select('*')
+      .order('event_date', { ascending: false });
+
+    if (error || !albumsData) return [];
+
+    const albumsWithCounts = await Promise.all(
+      albumsData.map(async (album) => {
+        const [{ count: pCount }, { count: vCount }] = await Promise.all([
+          supabase.from('gallery').select('id', { count: 'exact', head: true }).eq('album_id', album.id),
+          supabase.from('gallery_videos').select('id', { count: 'exact', head: true }).eq('album_id', album.id),
+        ]);
+        return {
+          ...album,
+          photo_count: pCount ?? 0,
+          video_count: vCount ?? 0,
+        };
+      })
+    );
+    return albumsWithCounts;
+  } catch {
+    return [];
+  }
+}
+
 export default async function GalleryPage() {
-  const items = await getGallery();
-  const isEmpty = items.length === 0;
+  const [items, albums] = await Promise.all([
+    getGallery(),
+    getAlbums(),
+  ]);
+  const isEmpty = items.length === 0 && albums.length === 0;
 
   return (
     <>
@@ -43,9 +73,15 @@ export default async function GalleryPage() {
             Momen, aksi, dan kehidupan di jalanan Hollow.
           </p>
           {!isEmpty && (
-            <div className={styles.heroStat}>
-              <span className={styles.heroStatValue}>{items.length}</span>
-              <span className={styles.heroStatLabel}>Photos</span>
+            <div style={{ display: 'inline-flex', gap: '16px', flexWrap: 'wrap', justifyContent: 'center' }}>
+              <div className={styles.heroStat}>
+                <span className={styles.heroStatValue}>{albums.length}</span>
+                <span className={styles.heroStatLabel}>Albums</span>
+              </div>
+              <div className={styles.heroStat}>
+                <span className={styles.heroStatValue}>{items.length}</span>
+                <span className={styles.heroStatLabel}>Photos</span>
+              </div>
             </div>
           )}
         </div>
@@ -61,11 +97,11 @@ export default async function GalleryPage() {
               </div>
               <h2 className={styles.emptyTitle}>Gallery Segera Hadir</h2>
               <p className={styles.emptyDesc}>
-                Koleksi foto Hollow sedang dalam proses pengisian. Stay tuned!
+                Koleksi foto dan album event Hollow sedang dalam proses pengisian. Stay tuned!
               </p>
             </div>
           ) : (
-            <GalleryGrid items={items} />
+            <GalleryGrid items={items} albums={albums} />
           )}
         </div>
       </section>

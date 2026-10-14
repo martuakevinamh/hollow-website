@@ -3,7 +3,8 @@
 import { useEffect, useState, useRef } from 'react';
 import { supabase, type GalleryItem } from '@/lib/supabase';
 import Image from 'next/image';
-import { ImagePlus, Trash2, Camera, X } from 'lucide-react';
+import Link from 'next/link';
+import { ImagePlus, Trash2, Camera, X, FolderOpen } from 'lucide-react';
 import styles from './gallery-admin.module.css';
 
 export default function GalleryAdmin() {
@@ -172,7 +173,7 @@ export default function GalleryAdmin() {
         <div className={styles.filters} style={{ display: 'flex', gap: '12px', flex: '1' }}>
           <input
             type="text"
-            placeholder="🔍 Search photos..."
+            placeholder="Search photos..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             className={styles.searchInput}
@@ -197,9 +198,18 @@ export default function GalleryAdmin() {
             <option value="both">Both</option>
           </select>
         </div>
-        <button onClick={handleAddOpen} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <ImagePlus size={18} /> Upload Photo
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <Link
+            href="/admin/gallery/albums"
+            className="btn btn-secondary"
+            style={{ display: 'flex', alignItems: 'center', gap: '8px' }}
+          >
+            <FolderOpen size={18} /> Kelola Album & Video
+          </Link>
+          <button onClick={handleAddOpen} className="btn btn-primary" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+            <ImagePlus size={18} /> Upload Photo
+          </button>
+        </div>
       </div>
 
       {loading ? (

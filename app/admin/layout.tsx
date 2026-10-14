@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   Users,
   Images,
+  FolderOpen,
   Newspaper,
   Settings,
   KeyRound,
@@ -50,11 +51,12 @@ function AdminProtectedContent({ children }: { children: React.ReactNode }) {
   }
 
   const menuItems = [
-    { href: '/admin',          label: 'Dashboard', Icon: LayoutDashboard },
-    { href: '/admin/members',  label: 'Members',   Icon: Users },
-    { href: '/admin/gallery',  label: 'Gallery',   Icon: Images },
-    { href: '/admin/news',     label: 'News',      Icon: Newspaper },
-    { href: '/admin/settings', label: 'Settings',  Icon: Settings },
+    { href: '/admin',                label: 'Dashboard', Icon: LayoutDashboard },
+    { href: '/admin/members',        label: 'Members',   Icon: Users },
+    { href: '/admin/gallery',        label: 'Gallery',   Icon: Images },
+    { href: '/admin/gallery/albums', label: 'Albums',    Icon: FolderOpen },
+    { href: '/admin/news',           label: 'News',      Icon: Newspaper },
+    { href: '/admin/settings',       label: 'Settings',  Icon: Settings },
     ...(role === 'utama' ? [{ href: '/admin/users', label: 'Admins', Icon: KeyRound }] : []),
   ];
 

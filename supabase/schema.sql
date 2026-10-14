@@ -69,6 +69,45 @@ CREATE INDEX IF NOT EXISTS idx_gallery_uploaded ON public.gallery(uploaded_at DE
 
 ALTER TABLE public.gallery DISABLE ROW LEVEL SECURITY;
 
+-- Migration: tambahkan album_id ke gallery
+ALTER TABLE public.gallery ADD COLUMN IF NOT EXISTS album_id UUID;
+
+
+-- ============================================
+-- TABEL: gallery_albums
+-- ============================================
+CREATE TABLE IF NOT EXISTS public.gallery_albums (
+  id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title       TEXT NOT NULL,
+  description TEXT,
+  server      TEXT NOT NULL CHECK (server IN ('samp','fivem','both')) DEFAULT 'both',
+  cover_url   TEXT,
+  event_date  TIMESTAMPTZ DEFAULT NOW(),
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_gallery_albums_server ON public.gallery_albums(server);
+CREATE INDEX IF NOT EXISTS idx_gallery_albums_date ON public.gallery_albums(event_date DESC);
+
+ALTER TABLE public.gallery_albums DISABLE ROW LEVEL SECURITY;
+
+
+-- ============================================
+-- TABEL: gallery_videos
+-- ============================================
+CREATE TABLE IF NOT EXISTS public.gallery_videos (
+  id         UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title      TEXT NOT NULL,
+  tiktok_url TEXT NOT NULL,
+  album_id   UUID REFERENCES public.gallery_albums(id) ON DELETE CASCADE,
+  server     TEXT NOT NULL CHECK (server IN ('samp','fivem','both')) DEFAULT 'both',
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX IF NOT EXISTS idx_gallery_videos_album ON public.gallery_videos(album_id);
+
+ALTER TABLE public.gallery_videos DISABLE ROW LEVEL SECURITY;
+
 
 -- ============================================
 -- STORAGE BUCKETS & RLS POLICIES
