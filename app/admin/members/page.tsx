@@ -238,6 +238,14 @@ export default function MembersAdmin() {
     }
   };
 
+  // Filter members
+  const filteredMembers = members.filter((member) => {
+    const matchesSearch = member.name_rp.toLowerCase().includes(search.toLowerCase());
+    const matchesRank   = rankFilter   ? member.rank   === rankFilter   : true;
+    const matchesServer = serverFilter ? member.server === serverFilter : true;
+    return matchesSearch && matchesRank && matchesServer;
+  });
+
   // Multi-select handlers
   const toggleSelectRow = (id: string) => {
     setSelectedIds((prev) =>
@@ -285,14 +293,6 @@ export default function MembersAdmin() {
       setIsBulkDeleting(false);
     }
   };
-
-  // Filter members
-  const filteredMembers = members.filter((member) => {
-    const matchesSearch = member.name_rp.toLowerCase().includes(search.toLowerCase());
-    const matchesRank   = rankFilter   ? member.rank   === rankFilter   : true;
-    const matchesServer = serverFilter ? member.server === serverFilter : true;
-    return matchesSearch && matchesRank && matchesServer;
-  });
 
   return (
     <div className={styles.container}>
